@@ -9,36 +9,35 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.haryadi.trigger.MainActivity"
-    tools:showIn="@layout/activity_main">
+    >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="WIFI"
+        android:gravity="center_horizontal"
         android:padding="8dp"
-        android:id="@+id/wifi"
-        android:background="@color/colorPrimary"/>
+        android:layout_marginBottom="8dp"
+        android:id="@+id/dialog_title"
+        android:background="@color/colorAccent"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NAME"
         android:id="@+id/name"
-        android:layout_below="@id/wifi"
+        android:layout_below="@id/dialog_title"
         android:padding="8dp"
         android:background="@color/colorPrimary"
         />
 
-    <EditText
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WIFI NAME"
         android:padding="8dp"
-        android:id="@+id/content_name"
+        android:id="@+id/spinner_wifi_name"
         android:layout_toRightOf="@id/name"
-        android:layout_below="@id/wifi"
+        android:layout_below="@id/dialog_title"
         />
 
     <TextView
@@ -51,56 +50,78 @@
         android:layout_marginTop="8dp"
         android:background="@color/colorPrimary"/>
 
-    <ToggleButton
+
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:id="@+id/content_isbluetoothon"
         android:layout_below="@id/name"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@id/bluetooth"/>
+        android:layout_toRightOf="@id/bluetooth"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SOUND"
+        android:text="MEDIA SOUND"
         android:layout_below="@id/bluetooth"
         android:padding="8dp"
-        android:id="@+id/sound"
+        android:id="@+id/media_sound"
         android:layout_marginTop="8dp"
-        android:background="@color/colorPrimary"/>
+        />
 
-    <EditText
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/media_seekbar"
+        android:layout_below="@id/media_sound" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/content_soundSetting"
-        android:layout_below="@id/bluetooth"
+        android:text="RING VOLUME"
+        android:layout_below="@id/media_seekbar"
+        android:padding="8dp"
+        android:id="@+id/ring_volume"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@id/bluetooth"/>
+        />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/ring_seekbar"
+        android:layout_below="@id/ring_volume" />
+
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="WIFI"
-        android:layout_below="@id/content_soundSetting"
+        android:layout_below="@id/ring_seekbar"
         android:padding="8dp"
         android:id="@+id/wifiOn"
         android:layout_marginTop="8dp"
         android:background="@color/colorPrimary"/>
 
-    <ToggleButton
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:id="@+id/content_iswifion"
-        android:layout_below="@id/content_soundSetting"
+        android:layout_below="@id/ring_seekbar"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@id/wifiOn"/>
+        android:layout_toRightOf="@id/wifiOn"
+        />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button_save"
-        android:layout_below="@id/content_iswifion"
+        android:layout_below="@id/wifiOn"
         android:text="SAVE"
-       />
+        />
 </RelativeLayout>

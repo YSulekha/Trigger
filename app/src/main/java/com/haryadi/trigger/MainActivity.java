@@ -57,7 +57,7 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_bac);
+        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -403,7 +403,6 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
             Log.v("drawG",geoFenceLimits.toString());
             geoFenceLimits.remove();
         }
-
 
         CircleOptions circleOptions = new CircleOptions()
                 .center( geoFenceMarker.getPosition())

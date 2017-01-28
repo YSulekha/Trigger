@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/holo_orange_light"
+    android:layout_margin="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_triggerName"
+        android:layout_alignParentTop="true"
+        android:text = "WIFI_SHIVA"
+        android:textColor="@color/accent"
+        android:padding="8dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id = "@+id/item_connect"
+        android:layout_alignParentRight="true"
+        android:text = "On Connect"
+        android:textColor="@color/accent"
+        android:padding="8dp"/>
+
+</RelativeLayout>

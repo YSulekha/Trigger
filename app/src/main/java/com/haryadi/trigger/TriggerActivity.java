@@ -1,6 +1,7 @@
 package com.haryadi.trigger;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,7 +11,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.haryadi.trigger.adapter.ScreenSlidePagerAdapter;
+import com.haryadi.trigger.fragment.EditCreateProfileFragment;
 
 /**
  * Created by aharyadi on 1/23/17.
@@ -24,6 +27,7 @@ public class TriggerActivity extends AppCompatActivity {
     FloatingActionButton wifiEnable;
     FloatingActionButton bluetoothEnable;
     FloatingActionButton locationEnable;
+    FloatingActionMenu floatingActionMenu;
 
 
     @Override
@@ -37,34 +41,48 @@ public class TriggerActivity extends AppCompatActivity {
         mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
 
+        floatingActionMenu = (FloatingActionMenu)findViewById(R.id.floatingActionMenu);
         wifiEnable = (FloatingActionButton)findViewById(R.id.wifi_enable);
-        wifiEnable.setOnClickListener(getOnClick());
+        wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
         bluetoothEnable = (FloatingActionButton)findViewById(R.id.bluetooth_enable);
-        bluetoothEnable.setOnClickListener(getOnClick());
+        bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
         locationEnable = (FloatingActionButton)findViewById(R.id.location_enable);
-        locationEnable.setOnClickListener(getOnClick());
+        locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
     }
 
-    public View.OnClickListener getOnClick(){
+    public View.OnClickListener getOnClick(final FloatingActionMenu fm){
+        FloatingActionButton b;
         return new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 if(v.getId() == R.id.wifi_enable){
                     Toast t = Toast.makeText(getApplicationContext(),"Wifi Clicked",Toast.LENGTH_SHORT);
                     t.show();
+                    fm.close(true);
+                    showEditDialog("WIFI");
                 }
                 else if(v.getId() == R.id.bluetooth_enable){
                     Toast t = Toast.makeText(getApplicationContext(),"bluetooth Clicked",Toast.LENGTH_SHORT);
                     t.show();
+                    fm.close(true);
+                    showEditDialog("BLUETOOTH");
                 }
                 else if(v.getId() == R.id.location_enable){
                     Toast t = Toast.makeText(getApplicationContext(),"location Clicked",Toast.LENGTH_SHORT);
                     t.show();
+                    fm.close(true);
+                    showEditDialog("LOCATION");
                 }
             }
         };
     }
 
+    private void showEditDialog(String title) {
+        FragmentManager fm = getSupportFragmentManager();
+        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title,false,null);
+        editNameDialogFragment.show(fm, title);
+    }
 
     @Override
     public void onBackPressed() {

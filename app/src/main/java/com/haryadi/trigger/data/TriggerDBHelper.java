@@ -22,11 +22,14 @@ public class TriggerDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_TABLE = "CREATE TABLE " + TriggerContract.TriggerEntry.TABLE_NAME + " (" +
 
                 TriggerContract.TriggerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT + " TEXT NOT NULL," +
                 TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME + " TEXT NOT NULL," +
                 TriggerContract.TriggerEntry.COLUMN_NAME + " TEXT NOT NULL," +
+                TriggerContract.TriggerEntry.COLUMN_CONNECT + " TEXT NOT NULL," +
                 TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON + " TEXT," +
                 TriggerContract.TriggerEntry.COLUMN_BRIGHTNESS + " TEXT," +
-                TriggerContract.TriggerEntry.COLUMN_SOUNDSETTING + " TEXT," +
+                TriggerContract.TriggerEntry.COLUMN_MEDIAVOL + " INTEGER," +
+                TriggerContract.TriggerEntry.COLUMN_RINGVOL + " INTEGER," +
                 TriggerContract.TriggerEntry.COLUMN_ISWIFION + " TEXT );";
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
     }

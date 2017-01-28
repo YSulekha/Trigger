@@ -41,7 +41,16 @@
         <receiver android:name=".service.WifiConnectivityReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.wifi.STATE_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+
+        <receiver android:name=".service.BluetoothConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
             </intent-filter>
         </receiver>
 
@@ -53,6 +62,8 @@
         android:value="@integer/google_play_services_version" />
 
         <service android:name=".service.GeofenceTrasitionService"/>
+        <service android:name=".service.ChangeSettingsIntentService"
+            android:exported="false"/>
 
 
     </application>

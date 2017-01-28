@@ -1,38 +1,34 @@
 package com.haryadi.trigger.fragment;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.haryadi.trigger.R;
+import com.haryadi.trigger.adapter.ProfileAdapter;
 import com.haryadi.trigger.data.TriggerContract;
 
 /**
  * Created by aharyadi on 1/23/17.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
 
-    ToggleButton mIsBluetoothOn;
-    ToggleButton mIsWifiOn;
-    EditText mSoundSetting;
-    EditText mWifiName;
-    String bluetoothOn = "false";
-    String wifiOn = "false";
-    Button saveButton;
+    RecyclerView mRecyclerView;
+    ProfileAdapter mAdapter;
+
+    private static final int LOADER_ID = 0;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,64 +40,40 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.content_main_bac, container, false);
-
-        mIsBluetoothOn = (ToggleButton)rootView.findViewById(R.id.content_isbluetoothon);
-        mIsWifiOn = (ToggleButton) rootView.findViewById(R.id.content_iswifion);
-        mSoundSetting = (EditText) rootView.findViewById(R.id.content_soundSetting);
-        mWifiName = (EditText) rootView.findViewById(R.id.content_name);
-        mIsBluetoothOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    bluetoothOn = "true";
-                    // The toggle is enabled
-                } else {
-                    // The toggle is disabled
-                    bluetoothOn = "false";
-                }
-            }
-        });
-        mIsWifiOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    wifiOn = "true";
-                    // The toggle is enabled
-                } else {
-                    // The toggle is disabled
-                    wifiOn = "false";
-                }
-            }
-        });
-
-        saveButton = (Button)rootView.findViewById(R.id.button_save);
-        saveButton.setOnClickListener(new View.OnClickListener() {
+                R.layout.fragment_profile, container, false);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_profile);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        mAdapter = new ProfileAdapter(getActivity(), new ProfileAdapter.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                onClickSave(v);
+            public void onClick(Uri uri) {
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit",true,uri);
+                editNameDialogFragment.show(fm, "Edit");
             }
         });
+        mRecyclerView.setAdapter(mAdapter);
+        getActivity().getLoaderManager().initLoader(LOADER_ID,null,this);
         return rootView;
     }
 
 
-    public void onClickSave(View view) {
-        insertRecord();
-        Cursor cursor = getActivity().getContentResolver().query(TriggerContract.TriggerEntry.CONTENT_URI, null, null, null, null);
-        Log.v("Count", String.valueOf(cursor.getCount()));
-        Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
+    @Override
+    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v("Inside Loader","ddd");
+        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+        //  Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
+        return new android.content.CursorLoader(getActivity(),uri,null,null,null,null);
     }
 
-    public void insertRecord() {
-        ContentValues values = new ContentValues();
-        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-        String soundSetting = mSoundSetting.getText().toString();
-        String name = "\"" + mWifiName.getText().toString() + "\"";
-        values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, "WIFI" + "_" + name);
-        Log.v("adadaf", "WIFI" + "_" + name);
-        values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
-        values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, bluetoothOn);
-        values.put(TriggerContract.TriggerEntry.COLUMN_SOUNDSETTING, soundSetting);
-        values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, "false");
-        getActivity().getContentResolver().insert(uri, values);
+    @Override
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
     }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+
+
 }

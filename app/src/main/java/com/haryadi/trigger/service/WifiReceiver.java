@@ -14,7 +14,7 @@ import android.util.Log;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.utils.ChangeSettings;
 
-public class WifiConnectivityReceiver  extends BroadcastReceiver{
+public class WifiReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -47,7 +47,7 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver{
                 ChangeSettings.changeSoundSettings(context, true);
             }
         }
-       else{
+        else{
             Log.v("Inside enabled", "ghh");
             ChangeSettings.changeBluetoothSetting(context, true);
             ChangeSettings.changeSoundSettings(context, true);

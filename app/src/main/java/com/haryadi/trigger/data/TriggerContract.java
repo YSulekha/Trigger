@@ -32,16 +32,22 @@ public class TriggerContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRIGGER;
 
         public static final String TABLE_NAME = "trigger";
+        //Column for trigger point
+        public static final String COLUMN_TRIGGER_POINT = "trigger_point";
         //Column for custom name of the trigger
         public static final String COLUMN_TRIGGER_NAME = "trigger_name";
         //Column for name of wifi,bluetooth or location
         public static final String COLUMN_NAME = "name";
+        //Column for triggerEnable/Disable
+        public static final String COLUMN_CONNECT = "isConnect";
         //bluetooth setting
         public static final String COLUMN_ISBLUETOOTHON = "bluetooth";
-        //sound setting
-        public static final String COLUMN_SOUNDSETTING = "sound";
         //wifi setting
         public static final String COLUMN_ISWIFION = "wifi";
+        //Column for setting media volume
+        public static final String COLUMN_MEDIAVOL = "media";
+        //Column for setting Ring volume
+        public static final String COLUMN_RINGVOL = "ring";
         //brightness setting
         public static final String COLUMN_BRIGHTNESS = "brightness";
 
