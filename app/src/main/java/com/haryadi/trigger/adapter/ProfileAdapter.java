@@ -77,6 +77,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             int pos = getAdapterPosition();
             mCursor.moveToPosition(pos);
             Uri uri = TriggerContract.TriggerEntry.buildTaskUri(mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID)));
+            Log.v("Uri",uri.toString());
             mListener.onClick(uri);
         }
     }

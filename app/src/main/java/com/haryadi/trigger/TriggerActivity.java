@@ -15,39 +15,46 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.haryadi.trigger.adapter.ScreenSlidePagerAdapter;
 import com.haryadi.trigger.fragment.EditCreateProfileFragment;
 
-/**
- * Created by aharyadi on 1/23/17.
- */
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class TriggerActivity extends AppCompatActivity {
 
-    private ViewPager mPager;
+    @BindView(R.id.viewPager) ViewPager mPager;
     private ScreenSlidePagerAdapter mAdapter;
 
-    FloatingActionButton wifiEnable;
-    FloatingActionButton bluetoothEnable;
-    FloatingActionButton locationEnable;
-    FloatingActionMenu floatingActionMenu;
+    @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
+    @BindView(R.id.wifi_disable) FloatingActionButton wifiDisable;
+    @BindView(R.id.bluetooth_enable)FloatingActionButton bluetoothEnable;
+    @BindView(R.id.bluetooth_disable)FloatingActionButton bluetoothDisable;
+    @BindView(R.id.location_enable)FloatingActionButton locationEnable;
+    @BindView(R.id.floatingActionMenu)FloatingActionMenu floatingActionMenu;
+    @BindView(R.id.toolbar)Toolbar toolbar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_pager);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+      //  toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPager = (ViewPager) findViewById(R.id.viewPager);
+     //   mPager = (ViewPager) findViewById(R.id.viewPager);
         mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
 
-        floatingActionMenu = (FloatingActionMenu)findViewById(R.id.floatingActionMenu);
-        wifiEnable = (FloatingActionButton)findViewById(R.id.wifi_enable);
+      //  floatingActionMenu = (FloatingActionMenu)findViewById(R.id.floatingActionMenu);
+        //wifiEnable = (FloatingActionButton)findViewById(R.id.wifi_enable);
         wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        bluetoothEnable = (FloatingActionButton)findViewById(R.id.bluetooth_enable);
+   //     bluetoothEnable = (FloatingActionButton)findViewById(R.id.bluetooth_enable);
         bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        locationEnable = (FloatingActionButton)findViewById(R.id.location_enable);
+   //     locationEnable = (FloatingActionButton)findViewById(R.id.location_enable);
         locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
+     //   wifiDisable = (FloatingActionButton)findViewById(R.id.wifi_disable);
+        wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
+       // bluetoothDisable = (FloatingActionButton)findViewById(R.id.bluetooth_disable);
+        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));
     }
 
     public View.OnClickListener getOnClick(final FloatingActionMenu fm){
@@ -73,6 +80,18 @@ public class TriggerActivity extends AppCompatActivity {
                     t.show();
                     fm.close(true);
                     showEditDialog("LOCATION");
+                }
+                if(v.getId() == R.id.wifi_disable){
+                    Toast t = Toast.makeText(getApplicationContext(),"Wifi Disable Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("WIFI DISABLE");
+                }
+                if(v.getId() == R.id.bluetooth_disable){
+                    Toast t = Toast.makeText(getApplicationContext(),"Bluetooth Disable Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("BLUETOOTH DISABLE");
                 }
             }
         };

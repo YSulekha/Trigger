@@ -92,6 +92,24 @@
             android:src="@drawable/ic_location_on_black_24dp"
             fab:fab_label="Enter Location"
             fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/wifi_disable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_signal_wifi_off_black_24dp"
+        fab:fab_label="Wifi Disconnect"
+        fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/bluetooth_disable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_bluetooth_disabled_black_24dp"
+            fab:fab_label="Bluetooth Disconnect"
+            fab:fab_size="mini" />
+
+
     </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,7 +1,6 @@
 package com.haryadi.trigger.data;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -53,7 +52,9 @@ public class TriggerContract {
 
         //returns uri with appended id
         public static Uri buildTaskUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+          //  return ContentUris.withAppendedId(CONTENT_URI, id);
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+
         }
 
         public static Uri buildUriWithName(String name) {
@@ -68,9 +69,16 @@ public class TriggerContract {
             return uri.getPathSegments().get(1);
         }
 
+        public static long getIdFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+
   /*      public static long getDateFromUriWithTaskName(Uri uri) {
+
             return Long.parseLong(uri.getPathSegments().get(2));
         }
+
+
 
         public static long getDateFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));

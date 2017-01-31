@@ -25,9 +25,6 @@ import com.haryadi.trigger.utils.ChangeSettings;
 
 import java.util.ArrayList;
 
-/**
- * Created by aharyadi on 1/25/17.
- */
 
 public class EditCreateProfileFragment extends DialogFragment {
 
@@ -42,6 +39,9 @@ public class EditCreateProfileFragment extends DialogFragment {
     ArrayList<String> names;
     ArrayAdapter<CharSequence> optionsAdapter;
     ArrayAdapter<String> arrayAdapter;
+    String isConnect = "Connect";
+    boolean isEdit = false;
+    Uri mUri;
 
 
     public EditCreateProfileFragment(){
@@ -54,6 +54,7 @@ public class EditCreateProfileFragment extends DialogFragment {
         Log.v("titleAct",triggerPoint);
         args.putString("title",triggerPoint);
         args.putBoolean("isEdit",isEdit);
+        Log.v("isEdit", String.valueOf(isEdit));
         if(uri !=null) {
             args.putString("Uri", uri.toString());
         }
@@ -73,17 +74,25 @@ public class EditCreateProfileFragment extends DialogFragment {
 
         TextView textTitle = (TextView)view.findViewById(R.id.dialog_title);
         triggerPoint = getArguments().getString("title", "Enter Name");
+        isEdit = getArguments().getBoolean("isEdit");
         textTitle.setText(triggerPoint);
         names = new ArrayList<>();
-        if(triggerPoint.equals("WIFI")) {
+        if(triggerPoint.equals("WIFI")|triggerPoint.equals("WIFI DISABLE")) {
             names = ChangeSettings.getConfiguredWifi(getActivity());
         }
-        if(triggerPoint.equals("BLUETOOTH")){
+        if(triggerPoint.equals("BLUETOOTH")|triggerPoint.equals("BLUETOOTH DISABLE")){
             names = ChangeSettings.getConfiguredBluetooth(getActivity());
         }
-        names.add("Shiv1a");
-        names.add("Soij");
+        if(triggerPoint.equals("WIFI DISABLE")||triggerPoint.equals("BLUETOOTH DISABLE")){
+            isConnect = "Disconnect";
+        }
+     //   names.add("Shiv1a");
+       // names.add("Soij");
         configureViews(view);
+        if(isEdit){
+            mUri = Uri.parse(getArguments().getString("Uri"));
+            configureValues(mUri);
+        }
     }
 
     private void onClickSave(View view) {
@@ -94,7 +103,7 @@ public class EditCreateProfileFragment extends DialogFragment {
         this.dismiss();
     }
 
-    private void configureViews(View view){
+    private void configureViews(View view) {
         mWifiName = (Spinner)view.findViewById(R.id.spinner_wifi_name);
         arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -110,7 +119,18 @@ public class EditCreateProfileFragment extends DialogFragment {
         mIsBluetoothOn.setAdapter(optionsAdapter);
         mIsWifiOn = (Spinner) view.findViewById(R.id.content_iswifion);
         mIsWifiOn.setAdapter(optionsAdapter);
-        mIsWifiOn.setEnabled(false);
+        if(triggerPoint.equals("WIFI")||triggerPoint.equals("WIFI DISABLE")){
+            mIsWifiOn.setSelection(0);
+            mIsWifiOn.setEnabled(false);
+        }
+        if(triggerPoint.equals("BLUETOOTH")||triggerPoint.equals("BLUETOOTH DISABLE")){
+            mIsBluetoothOn.setSelection(0);
+            mIsBluetoothOn.setEnabled(false);
+        }
+        if(isEdit){
+            //mWifiName.setEnabled(false);
+        }
+       // mIsWifiOn.setEnabled(false);
         saveButton = (Button)view.findViewById(R.id.button_save);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +138,46 @@ public class EditCreateProfileFragment extends DialogFragment {
                 onClickSave(v);
             }
         });
+    }
 
+    private void configureValues(Uri uri){
+        Log.v("Uri", String.valueOf(uri));
+        long id = TriggerContract.TriggerEntry.getIdFromUri(uri);
+         Log.v("Inside query",String.valueOf(id));
+        Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
+        Log.v("Count", String.valueOf(cursor.getCount()));
+        int pos = 0;
+        if(cursor.moveToNext()){
+            //int pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+            names.add("Edit");
+            String triggerPoint = cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
+Log.v("Trigger Point",triggerPoint);
+            if(triggerPoint.equals("WIFI")|triggerPoint.equals("WIFI DISABLE")){
+                mIsWifiOn.setSelection(0);
+                mIsWifiOn.setEnabled(false);
+                names = ChangeSettings.getConfiguredWifi(getActivity());
+                arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mWifiName.setAdapter(arrayAdapter);
+                pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+
+            }
+            else if(triggerPoint.equals("BLUETOOTH")|triggerPoint.equals("BLUETOOTH DISABLE")){
+                mIsBluetoothOn.setSelection(0);
+                mIsBluetoothOn.setEnabled(false);
+                names = ChangeSettings.getConfiguredBluetooth(getActivity());
+                arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mWifiName.setAdapter(arrayAdapter);
+                pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+            }
+            mWifiName.setSelection(pos);
+           mWifiName.setEnabled(false);
+            mIsBluetoothOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON))));
+            mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION))));
+            mediaVolumeBar.setProgress(cursor.getInt(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
+            ringVolumeBar.setProgress(cursor.getInt(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
+        }
     }
 
     private void insertRecord() {
@@ -127,15 +186,22 @@ public class EditCreateProfileFragment extends DialogFragment {
         String name = mWifiName.getSelectedItem().toString();
         Log.v("Adapter", name);
         Log.v("Adapter", String.valueOf(arrayAdapter.getPosition(name)));
-        values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,triggerPoint);
-        values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
-        values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT,"Connect");
         values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,mediaVolumeBar.getProgress());
-        values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL,mediaVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL,ringVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-        getActivity().getContentResolver().insert(uri, values);
+        if(isEdit){
+            updateRecord(values);
+        }
+        else {
+            ChangeSettings.addWifiNameToSharedPreference(getActivity());
+            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,triggerPoint);
+            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
+            values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT,isConnect);
+            getActivity().getContentResolver().insert(uri, values);
+        }
+
     }
 
     //Function for edit Values
@@ -144,6 +210,13 @@ public class EditCreateProfileFragment extends DialogFragment {
         if(values.moveToNext()){
             //mWifiName.getPo
         }
+    }
+
+    private void updateRecord(ContentValues values) {
+        String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                TriggerContract.TriggerEntry._ID + " = ?";
+        String[] args = new String[]{Long.toString(TriggerContract.TriggerEntry.getIdFromUri(mUri))};
+        getActivity().getContentResolver().update(TriggerContract.TriggerEntry.CONTENT_URI, values, where, args);
     }
 
     private void setVolumeSeekBar(){

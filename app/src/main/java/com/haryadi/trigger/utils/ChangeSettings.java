@@ -5,11 +5,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.haryadi.trigger.service.GeofenceTrasitionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +70,7 @@ public class ChangeSettings {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         ArrayList<String> wifiNames = new ArrayList<>();
         List<WifiConfiguration> configurations =  wifiManager.getConfiguredNetworks();
-        if(configurations.size()>0) {
+        if(configurations != null) {
             for (WifiConfiguration configuration : configurations) {
                 wifiNames.add(configuration.SSID);
             }
@@ -85,5 +89,24 @@ public class ChangeSettings {
             }
         }
         return blueToothNames;
+    }
+
+    public static void addWifiNameToSharedPreference(Context context){
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        String name = wifiInfo.getSSID();
+        if(!name.equals("<unknown ssid>")){
+            Log.v("ChangeSe",name);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor edit = prefs.edit();
+            edit.putString(GeofenceTrasitionService.SHARED_LAST_WIFI, name);
+            edit.commit();
+        }
+    }
+
+    public static void addBluetoothName(Context context){
+        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+       // bluetoothAdapter.get
     }
 }
