@@ -39,17 +39,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.service.GeofenceTrasitionService;
 
-/**
- * Created by aharyadi on 1/23/17.
- */
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
         GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener, ResultCallback<Status>
-        {
+        GoogleMap.OnMarkerClickListener, ResultCallback<Status> {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -57,7 +55,8 @@ public class MainFragment extends Fragment implements
     public static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 1;
 
     private GoogleApiClient mGoogleApiClient;
-            MapView mMapView;
+    @BindView(R.id.mapView)
+    MapView mMapView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,9 +69,10 @@ public class MainFragment extends Fragment implements
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_loc, container, false);
-    //    mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-      //  mapFragment = rootView.findViewById(R.id.map);
-        mMapView = (MapView)rootView.findViewById(R.id.mapView);
+        //    mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
+        //  mapFragment = rootView.findViewById(R.id.map);
+        // mMapView = (MapView)rootView.findViewById(R.id.mapView);
+        ButterKnife.bind(this, rootView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
@@ -82,14 +82,9 @@ public class MainFragment extends Fragment implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         mMapView.getMapAsync(this);
-
-
         initGMaps();
-
         setUpGoogleClient();
-
         return rootView;
     }
 
@@ -105,7 +100,7 @@ public class MainFragment extends Fragment implements
         mMapView.onPause();
     }
 
-            @Override
+    @Override
     public void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
@@ -114,11 +109,12 @@ public class MainFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient.isConnected())
+            mGoogleApiClient.disconnect();
     }
 
-    private void setUpGoogleClient(){
-        if(mGoogleApiClient == null){
+    private void setUpGoogleClient() {
+        if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                     addConnectionCallbacks(this).
                     addOnConnectionFailedListener(this).
@@ -127,7 +123,7 @@ public class MainFragment extends Fragment implements
         }
     }
 
-    private void initGMaps(){
+    private void initGMaps() {
 
 //        mapFragment.getMapAsync(this);
     }
@@ -138,38 +134,39 @@ public class MainFragment extends Fragment implements
         markerForGeofence(latLng);
     }
 
-    private void initCamera( LatLng latLng ) {
+    private void initCamera(LatLng latLng) {
         CameraPosition position = CameraPosition.builder()
-                .target( new LatLng( latLng.latitude,
-                        latLng.longitude ) )
-                .zoom( 16f )
-                .bearing( 0.0f )
-                .tilt( 0.0f )
+                .target(new LatLng(latLng.latitude,
+                        latLng.longitude))
+                .zoom(16f)
+                .bearing(0.0f)
+                .tilt(0.0f)
                 .build();
 
-        map.animateCamera( CameraUpdateFactory
-                .newCameraPosition( position ), null );
+        map.animateCamera(CameraUpdateFactory
+                .newCameraPosition(position), null);
 
-        map.setMapType( GoogleMap.MAP_TYPE_HYBRID);
-        map.setTrafficEnabled( true );
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.setTrafficEnabled(true);
         //  map.setMyLocationEnabled( true );
-        map.getUiSettings().setZoomControlsEnabled( true );
+        map.getUiSettings().setZoomControlsEnabled(true);
     }
 
     private Marker geoFenceMarker;
-    private void markerForGeofence(LatLng latLng){
-        Log.i("sdsa", "markerForGeofence("+latLng+")");
-        String title = latLng.latitude+" , "+ latLng.longitude;
+
+    private void markerForGeofence(LatLng latLng) {
+        Log.i("sdsa", "markerForGeofence(" + latLng + ")");
+        String title = latLng.latitude + " , " + latLng.longitude;
         MarkerOptions markerOptions = new MarkerOptions().title(title).
                 position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-        if(map!=null){
-            if(geoFenceMarker!=null){
+        if (map != null) {
+            if (geoFenceMarker != null) {
                 geoFenceMarker.remove();
             }
-            geoFenceMarker=map.addMarker(markerOptions);
+            geoFenceMarker = map.addMarker(markerOptions);
         }
         initCamera(latLng);
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED)
             checkPermission();
         else
@@ -181,36 +178,38 @@ public class MainFragment extends Fragment implements
     private static final float GEOFENCE_RADIUS = 100.0f; // in meters
 
     // Create a Geofence
-    private Geofence createGeofence(LatLng latLng, float radius ) {
+    private Geofence createGeofence(LatLng latLng, float radius) {
         Log.d("jjj", "createGeofence");
-        Log.v("latitude", String.valueOf(latLng.latitude+latLng.longitude));
+        Log.v("latitude", String.valueOf(latLng.latitude + latLng.longitude));
         return new Geofence.Builder()
                 .setRequestId(GEOFENCE_REQ_ID)
-                .setCircularRegion( latLng.latitude, latLng.longitude, GEOFENCE_RADIUS)
-                .setExpirationDuration( Geofence.NEVER_EXPIRE )
-                .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
-                        | Geofence.GEOFENCE_TRANSITION_EXIT )
+                .setCircularRegion(latLng.latitude, latLng.longitude, GEOFENCE_RADIUS)
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER
+                        | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
     }
 
     // Create a Geofence Request
-    private GeofencingRequest createGeofenceRequest(Geofence geofence ) {
+    private GeofencingRequest createGeofenceRequest(Geofence geofence) {
         Log.d("jj", "createGeofenceRequest");
         return new GeofencingRequest.Builder()
-                .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
-                .addGeofence( geofence )
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofence(geofence)
                 .build();
     }
+
     private PendingIntent geoFencePendingIntent;
     private final int GEOFENCE_REQ_CODE = 0;
+
     private PendingIntent createGeofencePendingIntent() {
         Log.d("nnnn", "createGeofencePendingIntent");
-        if ( geoFencePendingIntent != null )
+        if (geoFencePendingIntent != null)
             return geoFencePendingIntent;
 
-        Intent intent = new Intent( getActivity(), GeofenceTrasitionService.class);
+        Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
         return PendingIntent.getService(
-                getActivity(), GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+                getActivity(), GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     // Add the created GeofenceRequest to the device's monitoring list
@@ -279,7 +278,7 @@ public class MainFragment extends Fragment implements
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
 
-                    Log.v("Inside Permission G","dsfsf");
+                    Log.v("Inside Permission G", "dsfsf");
                     startGeofence();
 
 
@@ -297,8 +296,6 @@ public class MainFragment extends Fragment implements
     }
 
 
-
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.v("click", String.valueOf(marker.getPosition()));
@@ -308,8 +305,8 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        map  = googleMap;
-        Log.v("OnMaphh","sdsdf");
+        map = googleMap;
+        Log.v("OnMaphh", "sdsdf");
         LatLng sydney = new LatLng(-34, 151);
         //   map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         // map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
@@ -319,23 +316,23 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.v("OnConnected","dfdsf");
+        Log.v("OnConnected", "dfdsf");
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.v("OnConnectionSuspended","dfdsf");
+        Log.v("OnConnectionSuspended", "dfdsf");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.v("OnConnectionFailed","dfdsf");
+        Log.v("OnConnectionFailed", "dfdsf");
     }
 
     @Override
     public void onResult(@NonNull Status status) {
         Log.i("dsdf", "onResult: " + status);
-        if ( status.isSuccess() ) {
+        if (status.isSuccess()) {
             drawGeofence();
         } else {
             // inform about fail
@@ -344,33 +341,35 @@ public class MainFragment extends Fragment implements
 
     // Draw Geofence circle on GoogleMap
     private Circle geoFenceLimits;
+
     private void drawGeofence() {
         Log.d("df", "drawGeofence()");
 
 
-        if ( geoFenceLimits != null ){
-            Log.v("drawG",geoFenceLimits.toString());
+        if (geoFenceLimits != null) {
+            Log.v("drawG", geoFenceLimits.toString());
             geoFenceLimits.remove();
         }
 
 
         CircleOptions circleOptions = new CircleOptions()
-                .center( geoFenceMarker.getPosition())
+                .center(geoFenceMarker.getPosition())
                 .strokeColor(Color.BLACK)
-                .fillColor( Color.TRANSPARENT )
-                .radius( GEOFENCE_RADIUS )
-                .strokeWidth( 10 );;
-        geoFenceLimits = map.addCircle( circleOptions );
+                .fillColor(Color.TRANSPARENT)
+                .radius(GEOFENCE_RADIUS)
+                .strokeWidth(10);
+        ;
+        geoFenceLimits = map.addCircle(circleOptions);
     }
 
 
     // Start Geofence creation process
     private void startGeofence() {
         Log.i("add", "startGeofence()");
-        if( geoFenceMarker != null ) {
-            Geofence geofence = createGeofence( geoFenceMarker.getPosition(), GEOFENCE_RADIUS );
-            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
-            addGeofence( geofenceRequest );
+        if (geoFenceMarker != null) {
+            Geofence geofence = createGeofence(geoFenceMarker.getPosition(), GEOFENCE_RADIUS);
+            GeofencingRequest geofenceRequest = createGeofenceRequest(geofence);
+            addGeofence(geofenceRequest);
             drawGeofence();
         } else {
             Log.e("dfd", "Geofence marker is null");

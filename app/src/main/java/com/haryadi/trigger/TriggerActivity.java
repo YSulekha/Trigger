@@ -37,23 +37,14 @@ public class TriggerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_pager);
         ButterKnife.bind(this);
-      //  toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-     //   mPager = (ViewPager) findViewById(R.id.viewPager);
         mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
-
-      //  floatingActionMenu = (FloatingActionMenu)findViewById(R.id.floatingActionMenu);
-        //wifiEnable = (FloatingActionButton)findViewById(R.id.wifi_enable);
         wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
-   //     bluetoothEnable = (FloatingActionButton)findViewById(R.id.bluetooth_enable);
         bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
-   //     locationEnable = (FloatingActionButton)findViewById(R.id.location_enable);
         locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
-     //   wifiDisable = (FloatingActionButton)findViewById(R.id.wifi_disable);
         wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
-       // bluetoothDisable = (FloatingActionButton)findViewById(R.id.bluetooth_disable);
         bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));
     }
 

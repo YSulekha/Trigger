@@ -13,6 +13,7 @@ import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.haryadi.trigger.service.GeofenceTrasitionService;
 
 import java.util.ArrayList;
@@ -108,5 +109,18 @@ public class ChangeSettings {
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
        // bluetoothAdapter.get
+    }
+
+    public static String getErrorString(int errorCode) {
+        switch (errorCode) {
+            case GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE:
+                return "GeoFence not available";
+            case GeofenceStatusCodes.GEOFENCE_TOO_MANY_GEOFENCES:
+                return "Too many GeoFences";
+            case GeofenceStatusCodes.GEOFENCE_TOO_MANY_PENDING_INTENTS:
+                return "Too many pending intents";
+            default:
+                return "Unknown error.";
+        }
     }
 }

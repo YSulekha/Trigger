@@ -17,24 +17,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/white"
-            app:layout_collapseMode="pin"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="scroll|enterAlways">
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/toolbarText"
-                android:background="@color/white"
-                android:outlineProvider="bounds"
-                android:hint="Where'd you like to go?"
-                android:textSize="12sp"
-                android:padding="10dp"
-                android:textColorHint="#a7a7af"
-                android:clickable="true"
-
-                />
-        </android.support.v7.widget.Toolbar>
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -43,8 +27,6 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/viewPager"/>
-
-
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/floatingActionMenu"
@@ -85,7 +67,7 @@
         fab:menu_openDirection="up"
         fab:menu_backgroundColor="@android:color/transparent"
         fab:menu_fab_label="your_label_here"
-       >
+        >
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/wifi_enable"
@@ -112,12 +94,12 @@
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/wifi_disable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_signal_wifi_off_black_24dp"
-        fab:fab_label="Wifi Disconnect"
-        fab:fab_size="mini" />
+            android:id="@+id/wifi_disable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_signal_wifi_off_black_24dp"
+            fab:fab_label="Wifi Disconnect"
+            fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/bluetooth_disable"

@@ -7,4 +7,9 @@
         <item>Turn Off</item>
         <item>Turn On</item>
     </string-array>
+
+    <string-array name="location_options">
+        <item>Enter</item>
+        <item>Exit</item>
+    </string-array>
 </resources>

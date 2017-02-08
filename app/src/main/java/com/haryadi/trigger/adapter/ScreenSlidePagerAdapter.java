@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.haryadi.trigger.fragment.MainFragment;
+import com.haryadi.trigger.fragment.MainFragment_bac;
 import com.haryadi.trigger.fragment.ProfileFragment;
 
 /**
@@ -25,7 +25,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return new ProfileFragment();
             case 1:
-                return new MainFragment();
+                return new MainFragment_bac();
         }
         return null;
     }

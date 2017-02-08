@@ -14,50 +14,60 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.utils.ChangeSettings;
-import com.haryadi.trigger.utils.Constants;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * Created by aharyadi on 2/6/17.
+ */
 
-public class EditCreateProfileFragment extends DialogFragment {
+public class EditCreateLocationFragment extends DialogFragment {
 
-    @BindView(R.id.media_seekbar) SeekBar mediaVolumeBar;
+    @BindView(R.id.media_seekbar)
+    SeekBar mediaVolumeBar;
     @BindView(R.id.ring_seekbar) SeekBar ringVolumeBar;
-    @BindView(R.id.content_isbluetoothon) Spinner mIsBluetoothOn;
+    @BindView(R.id.content_isbluetoothon)
+    Spinner mIsBluetoothOn;
     @BindView(R.id.content_iswifion) Spinner mIsWifiOn;
-    @BindView(R.id.button_save) Button saveButton;
-    @BindView(R.id.spinner_wifi_name)  Spinner mWifiName;
-    @BindView(R.id.dialog_title) TextView textTitle;
+    @BindView(R.id.button_save)
+    Button saveButton;
+    @BindView(R.id.location_wifi_name)
+    EditText mLocationName;
+    @BindView(R.id.location_triggerValue)
+    Spinner mValue;
+    @BindView(R.id.dialog_title)
+    TextView textTitle;
     String triggerPoint;
-    ArrayList<String> names;
     ArrayAdapter<CharSequence> optionsAdapter;
-    ArrayAdapter<String> arrayAdapter;
+    ArrayAdapter<CharSequence> locationsOptionsAdapter;
     String isConnect = "Connect";
     boolean isEdit = false;
     Uri mUri;
+    static locationListener mListener;
 
-
-    public EditCreateProfileFragment(){
+    public EditCreateLocationFragment(){
 
     }
 
-    public static EditCreateProfileFragment newInstance(String triggerPoint, boolean isEdit, Uri uri){
-        EditCreateProfileFragment frag = new EditCreateProfileFragment();
+    public static interface locationListener{
+        void onListen(Bundle args);
+    }
+
+    public static EditCreateLocationFragment newInstance(String triggerPoint, boolean isEdit, Uri uri,locationListener list){
+        EditCreateLocationFragment frag = new EditCreateLocationFragment();
         Bundle args = new Bundle();
+        mListener = list;
         Log.v("titleAct",triggerPoint);
         args.putString("title",triggerPoint);
         args.putBoolean("isEdit",isEdit);
@@ -72,7 +82,7 @@ public class EditCreateProfileFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dialog,container);
+        return inflater.inflate(R.layout.fragment_dialog_location,container);
     }
 
     @Override
@@ -82,60 +92,25 @@ public class EditCreateProfileFragment extends DialogFragment {
         triggerPoint = getArguments().getString("title", "Enter Name");
         isEdit = getArguments().getBoolean("isEdit");
         textTitle.setText(triggerPoint);
-        names = new ArrayList<>();
-        if(triggerPoint.equals("WIFI")|triggerPoint.equals("WIFI DISABLE")) {
-            names = ChangeSettings.getConfiguredWifi(getActivity());
-        }
-        if(triggerPoint.equals("BLUETOOTH")|triggerPoint.equals("BLUETOOTH DISABLE")){
-            names = ChangeSettings.getConfiguredBluetooth(getActivity());
-        }
-        if(triggerPoint.equals("WIFI DISABLE")||triggerPoint.equals("BLUETOOTH DISABLE")){
-            isConnect = "Disconnect";
-        }
-        if(triggerPoint.equals("LOCATION")){
-            names = getLocationNames();
-        }
-     //   names.add("Shiv1a");
-       // names.add("Soij");
+
+
+        //   names.add("Shiv1a");
+        // names.add("Soij");
         configureViews();
         if(isEdit){
             mUri = Uri.parse(getArguments().getString("Uri"));
             configureValues(mUri);
         }
     }
-
-    public ArrayList<String> getLocationNames(){
-        ArrayList<String> res = new ArrayList<>();
-        for(Map.Entry<String,LatLng> entry:Constants.BAY_AREA_LANDMARKS.entrySet()){
-            res.add(entry.getKey());
-        }
-        return res;
-    }
-    @OnClick(R.id.button_save)
-    public void onClickSave(View view) {
-        insertRecord();
-        Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
-        this.dismiss();
-    }
-
     private void configureViews() {
-        arrayAdapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_spinner_item,names);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mWifiName.setAdapter(arrayAdapter);
+        locationsOptionsAdapter = ArrayAdapter.createFromResource(getActivity(),R.array.location_options,android.R.layout.simple_spinner_item);
+        locationsOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mValue.setAdapter(locationsOptionsAdapter);
         setVolumeSeekBar();
         optionsAdapter = ArrayAdapter.createFromResource(getActivity(),R.array.options,android.R.layout.simple_spinner_item);
         optionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mIsBluetoothOn.setAdapter(optionsAdapter);
         mIsWifiOn.setAdapter(optionsAdapter);
-        if(triggerPoint.equals("WIFI")||triggerPoint.equals("WIFI DISABLE")){
-            mIsWifiOn.setSelection(0);
-            mIsWifiOn.setEnabled(false);
-        }
-        if(triggerPoint.equals("BLUETOOTH")||triggerPoint.equals("BLUETOOTH DISABLE")){
-            mIsBluetoothOn.setSelection(0);
-            mIsBluetoothOn.setEnabled(false);
-        }
-
     }
 
     private void configureValues(Uri uri){
@@ -145,38 +120,16 @@ public class EditCreateProfileFragment extends DialogFragment {
         if(cursor.moveToNext()){
             //int pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
             String triggerPoint = cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
-Log.v("Trigger Point",triggerPoint);
-            if(triggerPoint.equals("WIFI")|triggerPoint.equals("WIFI DISABLE")){
-                Log.v("fdfg", String.valueOf(names.size()));
-                mIsWifiOn.setSelection(0);
-                mIsWifiOn.setEnabled(false);
-                names = ChangeSettings.getConfiguredWifi(getActivity());
-                arrayAdapter.notifyDataSetChanged();
-                Log.v("dsdf", String.valueOf(names.size()));
-                arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mWifiName.setAdapter(arrayAdapter);
-                pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
-
+            String value = cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_CONNECT));
+            if(value.equals("Connect")){
+                mValue.setSelection(0);
             }
-            else if(triggerPoint.equals("BLUETOOTH")|triggerPoint.equals("BLUETOOTH DISABLE")){
-                mIsBluetoothOn.setSelection(0);
-                mIsBluetoothOn.setEnabled(false);
-                names = ChangeSettings.getConfiguredBluetooth(getActivity());
-                arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mWifiName.setAdapter(arrayAdapter);
-                pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+            else{
+                mValue.setSelection(1);
             }
-            else if(triggerPoint.equals("LOCATION")){
-                names = getLocationNames();
-                arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,names);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mWifiName.setAdapter(arrayAdapter);
-                pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
-            }
-            mWifiName.setSelection(pos);
-            mWifiName.setEnabled(false);
+            mValue.setEnabled(false);
+            mLocationName.setText(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+            mLocationName.setEnabled(false);
             mIsBluetoothOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON))));
             mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION))));
             mediaVolumeBar.setProgress(cursor.getInt(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
@@ -187,7 +140,7 @@ Log.v("Trigger Point",triggerPoint);
     private void insertRecord() {
         ContentValues values = new ContentValues();
         Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-        String name = mWifiName.getSelectedItem().toString();
+        String name = mLocationName.getText().toString();
         values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,mediaVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL,ringVolumeBar.getProgress());
@@ -198,6 +151,12 @@ Log.v("Trigger Point",triggerPoint);
         }
         else {
             ChangeSettings.addWifiNameToSharedPreference(getActivity());
+            if(mValue.getSelectedItem().toString().equals("Enter")){
+                isConnect = "Connect";
+            }
+            else{
+                isConnect = "Disconnect";
+            }
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,triggerPoint);
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
             values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT,isConnect);
@@ -219,8 +178,8 @@ Log.v("Trigger Point",triggerPoint);
         ringVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
         mediaVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
-    //    mediaVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_MUSIC,audioManager));
-      //  ringVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_RING,audioManager));
+        //    mediaVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_MUSIC,audioManager));
+        //  ringVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_RING,audioManager));
     }
 
   /*  private SeekBar.OnSeekBarChangeListener createSeekBarChangeListener(final int streamType,final AudioManager audioManager){
@@ -241,4 +200,19 @@ Log.v("Trigger Point",triggerPoint);
             }
         };
     }*/
+
+    @OnClick(R.id.button_save)
+    public void onClickSave(View view) {
+        insertRecord();
+        Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
+
+        Bundle args = new Bundle();
+        args.putString("Name",mLocationName.getText().toString());
+        args.putString("Value",mValue.getSelectedItem().toString());
+        if(mListener!=null){
+            mListener.onListen(args);
+        }
+        this.dismiss();
+    }
+
 }

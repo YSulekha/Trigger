@@ -6,24 +6,24 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.TriggerActivity;
+import com.haryadi.trigger.data.TriggerContract;
+import com.haryadi.trigger.utils.ChangeSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by aharyadi on 1/13/17.
- */
 
 public class GeofenceTrasitionService extends IntentService {
 
@@ -48,7 +48,7 @@ public class GeofenceTrasitionService extends IntentService {
 
         // Handling errors
         if ( geofencingEvent.hasError() ) {
-            String errorMsg = getErrorString(geofencingEvent.getErrorCode() );
+            String errorMsg = ChangeSettings.getErrorString(geofencingEvent.getErrorCode() );
             Log.e( TAG, errorMsg );
             return;
         }
@@ -64,6 +64,38 @@ public class GeofenceTrasitionService extends IntentService {
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences );
             // Send notification details as a String
             sendNotification( geofenceTransitionDetails );
+            checkDatabase(triggeringGeofences);
+        }
+    }
+
+    public void checkDatabase(List<Geofence> trigger){
+        for(Geofence geofence : trigger){
+            String name = geofence.getRequestId();
+            Uri uri = TriggerContract.TriggerEntry.buildUriWithName(name);
+            Cursor c = getContentResolver().query(uri,null,null,null,null);
+            if(c.moveToNext()){
+                if (c != null) {
+                    Log.v("Inside enabled", "jhh");
+                    String bluetooth = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON));
+                    String wifi = c.getString((c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION)));
+                    if (bluetooth.equals("Turn On")) {
+                        ChangeSettings.changeBluetoothSetting(this, true);
+                    } else if(bluetooth.equals("Turn Off")){
+                        ChangeSettings.changeBluetoothSetting(this, false);
+                    }
+                    if (wifi.equals("Turn On")) {
+                        ChangeSettings.changeWifiSettings(this, true);
+                    } else if(wifi.equals("Turn Off")){
+                        ChangeSettings.changeWifiSettings(this, false);
+                    }
+
+                    Log.v("Volume", String.valueOf(c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL))));
+                    ChangeSettings.changeMediaVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
+                    ChangeSettings.changeRingVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
+                }
+                Log.v("HasData","true");
+                Log.v("FasDataC", String.valueOf(c.getCount()));
+            }
         }
     }
     // Create a detail message with Geofences received
@@ -114,19 +146,5 @@ public class GeofenceTrasitionService extends IntentService {
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
         return notificationBuilder.build();
-    }
-
-    // Handle errors
-    private static String getErrorString(int errorCode) {
-        switch (errorCode) {
-            case GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE:
-                return "GeoFence not available";
-            case GeofenceStatusCodes.GEOFENCE_TOO_MANY_GEOFENCES:
-                return "Too many GeoFences";
-            case GeofenceStatusCodes.GEOFENCE_TOO_MANY_PENDING_INTENTS:
-                return "Too many pending intents";
-            default:
-                return "Unknown error.";
-        }
     }
 }
