@@ -360,6 +360,14 @@ public class MainFragment extends Fragment implements
                 .strokeWidth(10);
         ;
         geoFenceLimits = map.addCircle(circleOptions);
+
+         /*    CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(latLng)     // Sets the center of the map to location user
+                        .zoom(17)                   // Sets the zoom
+                        .bearing(90)                // Sets the orientation of the camera to east
+                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));*/
     }
 
 
@@ -375,4 +383,59 @@ public class MainFragment extends Fragment implements
             Log.e("dfd", "Geofence marker is null");
         }
     }
+
+    /* //Show DialogBoc when longclicked on Map
+    private void showAlertDialog(final LatLng latLng){
+        View messageView = LayoutInflater.from(getActivity()).inflate(R.layout.message_item,null);
+
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+        alertBuilder.setView(messageView);
+
+       final AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText titleText = (EditText) alertDialog.findViewById(R.id.etTitle);
+                if(titleText.getText().toString().trim().equals("")) {
+                    titleText.setError("Title is a required filed");
+                }
+                else {
+                    BitmapDescriptor defaultMarker =
+                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+
+                    String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
+                            getText().toString();
+
+
+                    String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
+                            getText().toString();
+                    Log.v("Name",title);
+                    // Creates and adds marker to the map
+                    Marker marker = map.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title(title)
+                            .snippet(snippet)
+                            .icon(defaultMarker));
+
+                    Constants.BAY_AREA_LANDMARKS.put(title, latLng);
+                    addToGeoFence();
+
+
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("LOCATION", false, null);
+                    editNameDialogFragment.show(fm, "LOCATION");
+                }
+
+            }
+        });
+        // Configure dialog button (Cancel)
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+                });
+
+        // Display the dialog
+        alertDialog.show();
+
+    }*/
 }

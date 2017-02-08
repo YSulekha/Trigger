@@ -24,7 +24,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     OnItemClickListener mListener;
 
     public interface OnItemClickListener {
-        void onClick(Uri uri);
+        void onClick(Uri uri,String trigger);
     }
 
 
@@ -76,9 +76,10 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         public void onClick(View v) {
             int pos = getAdapterPosition();
             mCursor.moveToPosition(pos);
+            String triggerPoint = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
             Uri uri = TriggerContract.TriggerEntry.buildTaskUri(mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID)));
             Log.v("Uri",uri.toString());
-            mListener.onClick(uri);
+            mListener.onClick(uri,triggerPoint);
         }
     }
 }

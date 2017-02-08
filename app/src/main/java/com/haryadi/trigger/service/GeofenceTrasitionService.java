@@ -64,15 +64,29 @@ public class GeofenceTrasitionService extends IntentService {
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences );
             // Send notification details as a String
             sendNotification( geofenceTransitionDetails );
-            checkDatabase(triggeringGeofences);
+            checkDatabase(triggeringGeofences,geoFenceTransition);
         }
     }
 
-    public void checkDatabase(List<Geofence> trigger){
+    public void checkDatabase(List<Geofence> trigger,int transition){
+        Log.v("CheckDatabase", String.valueOf(trigger.size()));
         for(Geofence geofence : trigger){
             String name = geofence.getRequestId();
-            Uri uri = TriggerContract.TriggerEntry.buildUriWithName(name);
-            Cursor c = getContentResolver().query(uri,null,null,null,null);
+            String connect = "connect";
+            Log.v("InsideFor",name);
+            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
+                connect = "Connect";
+            }
+            else{
+                connect="Disconnect";
+            }
+            Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+            String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                    TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT + " = ?" + " AND "+
+                    TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
+            String[] args = new String[]{"LOCATION" + "_" + name,connect};
+            Cursor c = getContentResolver().query(uri,null,where,args,null);
+            Log.v("InsideFor", String.valueOf(c.getCount()));
             if(c.moveToNext()){
                 if (c != null) {
                     Log.v("Inside enabled", "jhh");
@@ -105,7 +119,6 @@ public class GeofenceTrasitionService extends IntentService {
         for ( Geofence geofence : triggeringGeofences ) {
             triggeringGeofencesList.add( geofence.getRequestId() );
         }
-
         String status = null;
         if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER )
             status = "Entering ";

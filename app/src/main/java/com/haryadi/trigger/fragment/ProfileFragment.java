@@ -45,10 +45,17 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
         mAdapter = new ProfileAdapter(getActivity(), new ProfileAdapter.OnItemClickListener() {
             @Override
-            public void onClick(Uri uri) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit",true,uri);
-                editNameDialogFragment.show(fm, "Edit");
+            public void onClick(Uri uri,String trigger) {
+                if(trigger.equals("LOCATION")){
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null);
+                    editLocationDialogFragment.show(fm, "Edit");
+                }
+                else {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit", true, uri);
+                    editNameDialogFragment.show(fm, "Edit");
+                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);

@@ -37,7 +37,7 @@ public class TriggerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_pager);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+      //  setSupportActionBar(toolbar);
 
         mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
@@ -67,10 +67,10 @@ public class TriggerActivity extends AppCompatActivity {
                     showEditDialog("BLUETOOTH");
                 }
                 else if(v.getId() == R.id.location_enable){
-                    Toast t = Toast.makeText(getApplicationContext(),"location Clicked",Toast.LENGTH_SHORT);
+                    Toast t = Toast.makeText(getApplicationContext(),"Add a location:By addingPin or Search for a location",Toast.LENGTH_SHORT);
                     t.show();
                     fm.close(true);
-                    showEditDialog("LOCATION");
+                   // showEditDialog("LOCATION");
                 }
                 if(v.getId() == R.id.wifi_disable){
                     Toast t = Toast.makeText(getApplicationContext(),"Wifi Disable Clicked",Toast.LENGTH_SHORT);

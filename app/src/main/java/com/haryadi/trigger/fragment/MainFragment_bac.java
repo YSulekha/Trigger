@@ -2,7 +2,6 @@ package com.haryadi.trigger.fragment;
 
 import android.Manifest;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,17 +52,13 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-/**
- * Created by aharyadi on 2/3/17.
- */
-
 public class MainFragment_bac extends Fragment implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMapLongClickListener,
         ResultCallback<Status>,
-        EditCreateLocationFragment.locationListener{
+        EditCreateLocationFragment.locationListener {
 
     @BindView(R.id.mapView)
     MapView mMapView;
@@ -96,17 +90,13 @@ public class MainFragment_bac extends Fragment implements
                 addApi(LocationServices.API)
                 .build();
 
-        EditText search = (EditText)getActivity().findViewById(R.id.toolbarText);
+        EditText search = (EditText) getActivity().findViewById(R.id.toolbarText);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onClickOfSearchIcon();
             }
         });
-
-
-
-
         return rootview;
 
     }
@@ -114,16 +104,14 @@ public class MainFragment_bac extends Fragment implements
     @Override
     public void onStart() {
         mMapView.onStart();
-        super.onStart();
         mGoogleApiClient.connect();
-
+        super.onStart();
     }
 
     @Override
     public void onResume() {
         mMapView.onResume();
         super.onResume();
-
     }
 
     @Override
@@ -149,50 +137,31 @@ public class MainFragment_bac extends Fragment implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        map.animateCamera( CameraUpdateFactory.zoomTo( 14.0f ) );
+        map.animateCamera(CameraUpdateFactory.zoomTo(14.0f));
         map.setOnMapLongClickListener(this);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.v("Connected","Inside");
+        Log.v("Connected", "Inside");
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-            ActivityCompat.requestPermissions(getActivity(),
+            Log.v("Connected", "InsideIf");
+            //requestPermissions();
+            requestPermissions(
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_PERMISSIONS_REQUEST_LOCATION);
             return;
-        }
-        else {
-
+        } else {
+            Log.v("Connected", "InsideElse");
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-          //  Log.v("Connected_else",mLastLocation.getLatitude()+mLastLocation.getProvider());
-            if(mLastLocation != null){
-                Log.v("last Location","kk");
+            if (mLastLocation != null) {
+                Log.v("last Location", "kk");
                 map.setMyLocationEnabled(true);
-                LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-            //    map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
-             //   map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                //    map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
+                //   map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         latLng, 18));
-
-            /*    CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(latLng)     // Sets the center of the map to location user
-                        .zoom(17)                   // Sets the zoom
-                        .bearing(90)                // Sets the orientation of the camera to east
-                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));*/
-
-
-
             }
         }
     }
@@ -200,6 +169,7 @@ public class MainFragment_bac extends Fragment implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
+        Log.v("InsideReq",String.valueOf(requestCode));
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -208,43 +178,27 @@ public class MainFragment_bac extends Fragment implements
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     Log.v("Location", "granted");
-                    if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-
-                        Log.v("Connected_else",mLastLocation.getLatitude()+mLastLocation.getProvider());
+                    if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                      //  Log.v("Connected_else", mLastLocation.getLatitude() + mLastLocation.getProvider());
+                        Log.v("Location", "granted");
                         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                        if(mLastLocation != null){
-                            Log.v("last Location",mLastLocation.toString());
-                            LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-                          //  map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
-                        //    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
-                          //  map.animateCamera(cameraUpdate);
+                        if (mLastLocation != null) {
+                            Log.v("last Location", mLastLocation.toString());
+                            LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                            //  map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
+                            //    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                            //  map.animateCamera(cameraUpdate);
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     latLng, 18));
-
                         }
-
                         return;
                     }
 
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Log.v("InsideElse","OnResult");
+                    Log.v("InsideElse", "OnResult");
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
@@ -260,158 +214,115 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        Toast.makeText(getActivity(),"On Click",Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "On Click", Toast.LENGTH_LONG).show();
         searchPlace = latLng;
         //showAlertDialog(latLng);
         showLocationFragment();
     }
 
-    private void showLocationFragment(){
+    private void showLocationFragment() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null,this);
+        EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, this);
         editNameDialogFragment.show(fm, "LOCATION");
     }
 
-    //Show DialogBoc when longclicked on Map
-    private void showAlertDialog(final LatLng latLng){
-        View messageView = LayoutInflater.from(getActivity()).inflate(R.layout.message_item,null);
-
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
-        alertBuilder.setView(messageView);
-
-       final AlertDialog alertDialog = alertBuilder.create();
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText titleText = (EditText) alertDialog.findViewById(R.id.etTitle);
-                if(titleText.getText().toString().trim().equals("")) {
-                    titleText.setError("Title is a required filed");
-                }
-                else {
-                    BitmapDescriptor defaultMarker =
-                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-
-
-                    // Extract content from alert dialog
-
-                    String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
-                            getText().toString();
-
-
-                    String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
-                            getText().toString();
-                    Log.v("Name",title);
-                    // Creates and adds marker to the map
-                    Marker marker = map.addMarker(new MarkerOptions()
-                            .position(latLng)
-                            .title(title)
-                            .snippet(snippet)
-                            .icon(defaultMarker));
-
-                    Constants.BAY_AREA_LANDMARKS.put(title, latLng);
-                    addToGeoFence();
-
-
-                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                    EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("LOCATION", false, null);
-                    editNameDialogFragment.show(fm, "LOCATION");
-                }
-
-            }
-        });
-        // Configure dialog button (Cancel)
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
-                });
-
-        // Display the dialog
-        alertDialog.show();
-
-    }
-
-    public void populateGeoFenceList(){
-        Log.v("Populate","Geofence");
-        for(Map.Entry<String,LatLng> entry:Constants.BAY_AREA_LANDMARKS.entrySet()){
+    public void populateGeoFenceList() {
+        Log.v("Populate", "Geofence");
+        for (Map.Entry<String, LatLng> entry : Constants.BAY_AREA_LANDMARKS.entrySet()) {
             mGeofenceList.add(new Geofence.Builder().
                     setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER).
                     setRequestId(entry.getKey()).
                     setExpirationDuration(Geofence.NEVER_EXPIRE).
-                    setCircularRegion(entry.getValue().latitude,entry.getValue().longitude,Constants.GEOFENCE_RADIUS_IN_METERS).
+                    setCircularRegion(entry.getValue().latitude, entry.getValue().longitude, Constants.GEOFENCE_RADIUS_IN_METERS).
                     build());
         }
     }
 
-    public PendingIntent getPendingIntent(){
-        Log.v("pendingIntent","Geofence");
-        Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getActivity(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-        return pendingIntent;
-    }
-
-    public GeofencingRequest createGeofenceReq(){
-        Log.v("GeofenceReq","Geofence");
-       GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.addGeofences(mGeofenceList);
-        builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+    public Geofence createGeofenceObject(String name,String transition){
+        Geofence.Builder builder= new Geofence.Builder().
+                setRequestId(name).
+                setExpirationDuration(Geofence.NEVER_EXPIRE).
+                setCircularRegion(searchPlace.latitude, searchPlace.longitude, Constants.GEOFENCE_RADIUS_IN_METERS);
+        if (transition.equals("Enter"))
+            builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+        else{
+            builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT);
+        }
         return builder.build();
     }
 
-    public void addToGeoFence(){
-        Log.v("addToGeofence","Geofence");
-        populateGeoFenceList();
-        try{
-            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient,createGeofenceReq(),getPendingIntent()).setResultCallback(this);
+    public PendingIntent getPendingIntent() {
+        Log.v("pendingIntent", "Geofence");
+        Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return pendingIntent;
+    }
+
+    public GeofencingRequest createGeofenceReq(String name,String transition) {
+        Log.v("GeofenceReq", "Geofence");
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        //builder.addGeofences(mGeofenceList);
+        builder.addGeofence(createGeofenceObject(name,transition));
+        if (transition.equals("Enter"))
+            builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+        else{
+            builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_EXIT);
         }
-        catch(SecurityException ex){
-            Log.v("No permission","dds");
+        return builder.build();
+    }
+
+    public void addToGeoFence(String name, String transition) {
+        Log.v("addToGeofence", "Geofence");
+       // populateGeoFenceList();
+      //  createGeofenceObject(name);
+        try {
+            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, createGeofenceReq(name,transition), getPendingIntent()).setResultCallback(this);
+        } catch (SecurityException ex) {
+            Log.v("No permission", "dds");
         }
 
     }
 
-//Method called when geoFence is added
-    public void onResult(Status status){
-        if(status.isSuccess()){
-            Toast.makeText(getActivity(),"Geofence Added",Toast.LENGTH_LONG).show();
-        }
-        else{
-           String error = ChangeSettings.getErrorString(status.getStatusCode());
+    //Method called when geoFence is added
+    public void onResult(Status status) {
+        if (status.isSuccess()) {
+            Toast.makeText(getActivity(), "Geofence Added", Toast.LENGTH_LONG).show();
+        } else {
+            String error = ChangeSettings.getErrorString(status.getStatusCode());
             Log.v("Error", error);
 
         }
     }
 
     //searching location
-    public void onClickOfSearchIcon(){
+    public void onClickOfSearchIcon() {
         try {
+            Log.v("Inside Search","adad");
             Intent intent =
                     new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
                             .build(getActivity());
             startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
         } catch (GooglePlayServicesRepairableException e) {
-            // TODO: Handle the error.
+            Log.v("PlayServicesRepiar", e.getMessage());
         } catch (GooglePlayServicesNotAvailableException e) {
-            // TODO: Handle the error.
+            Log.v("PlayServicesNAva", e.getMessage());
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v("Inside Result",String.valueOf(requestCode));
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
                 searchPlace = place.getLatLng();
                 Log.v("SearchAct", "Place: " + place.getName());
-
-
-
-
                 FragmentManager fm = getActivity().getSupportFragmentManager();
 
-                EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null,this);
+                EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, this);
                 editNameDialogFragment.show(fm, "LOCATION");
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(getActivity(), data);
-                // TODO: Handle the error.
                 Log.v("SearchAct", status.getStatusMessage());
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -422,19 +333,15 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onListen(Bundle args) {
-
-        Log.v("Inside Listen","ddsf");
+        Log.v("Inside Listen", "ddsf");
         BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-
-
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(searchPlace)
                 .title(args.getString("Name"))
                 .snippet(args.getString("Value"))
                 .icon(defaultMarker));
-
         Constants.BAY_AREA_LANDMARKS.put(args.getString("Name"), searchPlace);
-        addToGeoFence();
+        addToGeoFence(args.getString("Name"),args.getString("Value"));
     }
 }
