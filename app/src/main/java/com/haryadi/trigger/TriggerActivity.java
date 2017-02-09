@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,13 +22,13 @@ public class TriggerActivity extends AppCompatActivity {
     @BindView(R.id.viewPager) ViewPager mPager;
     private ScreenSlidePagerAdapter mAdapter;
 
-    @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
+ /*   @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
     @BindView(R.id.wifi_disable) FloatingActionButton wifiDisable;
     @BindView(R.id.bluetooth_enable)FloatingActionButton bluetoothEnable;
     @BindView(R.id.bluetooth_disable)FloatingActionButton bluetoothDisable;
     @BindView(R.id.location_enable)FloatingActionButton locationEnable;
     @BindView(R.id.floatingActionMenu)FloatingActionMenu floatingActionMenu;
-    @BindView(R.id.toolbar)Toolbar toolbar;
+    @BindView(R.id.toolbar)Toolbar toolbar;*/
 
 
     @Override
@@ -41,11 +40,11 @@ public class TriggerActivity extends AppCompatActivity {
 
         mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
-        wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
+   /*     wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
         bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
         locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
         wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
-        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));
+        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));*/
     }
 
     public View.OnClickListener getOnClick(final FloatingActionMenu fm){

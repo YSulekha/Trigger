@@ -113,9 +113,12 @@ public class EditCreateProfileFragment extends DialogFragment {
     }
     @OnClick(R.id.button_save)
     public void onClickSave(View view) {
-        insertRecord();
-        Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
-        this.dismiss();
+        Log.v("Inside Save","dsdd");
+        if(!checkForDuplicates()) {
+            insertRecord();
+            Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
+            this.dismiss();
+        }
     }
 
     private void configureViews() {
@@ -200,10 +203,35 @@ Log.v("Trigger Point",triggerPoint);
             ChangeSettings.addWifiNameToSharedPreference(getActivity());
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,triggerPoint);
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
+            Log.v("Trigger",triggerPoint + "_" + name+isConnect);
             values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT,isConnect);
             getActivity().getContentResolver().insert(uri, values);
         }
 
+    }
+    private boolean checkForDuplicates(){
+        Log.v("Duplicates","sff");
+        if(!isEdit) {
+            Log.v("Duplicates","sff1");
+            String name = mWifiName.getSelectedItem().toString();
+            Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+            String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                    TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME + " = ?" + " AND " +
+                    TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
+            String[] args = new String[]{triggerPoint + "_" + name, isConnect};
+            Log.v("Trigger",triggerPoint + "_" + name);
+            Log.v("Where",isConnect);
+            Cursor c = getActivity().getContentResolver().query(uri, null, where, args, null);
+            Log.v("Duplicates", String.valueOf(c.getCount()));
+            if(c.moveToNext()){
+                Toast.makeText(getActivity(),"There is already a proile for this trigger",Toast.LENGTH_LONG).show();
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        return false;
     }
 
     private void updateRecord(ContentValues values) {

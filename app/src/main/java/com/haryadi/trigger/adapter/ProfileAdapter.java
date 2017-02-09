@@ -1,5 +1,6 @@
 package com.haryadi.trigger.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,16 +13,37 @@ import android.widget.TextView;
 
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
+import com.haryadi.trigger.touch_helper.ItemTouchHelperAdapter;
 
 /**
  * Created by aharyadi on 1/25/17.
+ * AIzaSyAWot9ZEWXoCj8LtO7CTf7HJeGUIUpfDAA
  */
 
-public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
+public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> implements ItemTouchHelperAdapter {
 
     Context mContext;
     Cursor mCursor;
     OnItemClickListener mListener;
+
+    @Override
+    public void onItemDismiss(int position) {
+
+        mCursor.moveToPosition(position);
+        ContentValues deleteValues = new ContentValues();
+        long id = mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID));
+        String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                TriggerContract.TriggerEntry._ID + " = ?";
+        String[] args = new String[]{Long.toString(id)};
+        mContext.getContentResolver().delete(TriggerContract.TriggerEntry.CONTENT_URI, where, args);
+        notifyItemRemoved(position);
+
+    }
+
+    @Override
+    public void onItemStatusChanged(int position) {
+
+    }
 
     public interface OnItemClickListener {
         void onClick(Uri uri,String trigger);

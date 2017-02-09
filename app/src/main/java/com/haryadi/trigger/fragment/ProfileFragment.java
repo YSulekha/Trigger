@@ -6,8 +6,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.view.ViewGroup;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.adapter.ProfileAdapter;
 import com.haryadi.trigger.data.TriggerContract;
+import com.haryadi.trigger.touch_helper.TouchhelperCallback;
 
 /**
  * Created by aharyadi on 1/23/17.
@@ -26,6 +30,7 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
 
     RecyclerView mRecyclerView;
     ProfileAdapter mAdapter;
+    Toolbar toolbar;
 
     private static final int LOADER_ID = 0;
 
@@ -41,6 +46,8 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_profile, container, false);
+        toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_profile);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
         mAdapter = new ProfileAdapter(getActivity(), new ProfileAdapter.OnItemClickListener() {
@@ -59,6 +66,9 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+        ItemTouchHelper.Callback callback = new TouchhelperCallback(mAdapter,getActivity());
+        ItemTouchHelper helper = new ItemTouchHelper(callback);
+        helper.attachToRecyclerView(mRecyclerView);
         getActivity().getLoaderManager().initLoader(LOADER_ID,null,this);
         return rootView;
     }

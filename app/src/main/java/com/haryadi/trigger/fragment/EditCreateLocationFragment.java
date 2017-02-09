@@ -92,8 +92,6 @@ public class EditCreateLocationFragment extends DialogFragment {
         triggerPoint = getArguments().getString("title", "Enter Name");
         isEdit = getArguments().getBoolean("isEdit");
         textTitle.setText(triggerPoint);
-
-
         //   names.add("Shiv1a");
         // names.add("Soij");
         configureViews();
@@ -172,6 +170,37 @@ public class EditCreateLocationFragment extends DialogFragment {
         getActivity().getContentResolver().update(TriggerContract.TriggerEntry.CONTENT_URI, values, where, args);
     }
 
+    private boolean checkForDuplicates(){
+        Log.v("Duplicates","sff");
+        if(!isEdit) {
+            Log.v("Duplicates","sff1");
+            String name = mLocationName.getText().toString();
+            if(mValue.getSelectedItem().toString().equals("Enter")){
+                isConnect = "Connect";
+            }
+            else{
+                isConnect = "Disconnect";
+            }
+            Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+            String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                    TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME + " = ?" + " AND " +
+                    TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
+            String[] args = new String[]{triggerPoint + "_" + name, isConnect};
+            Log.v("Trigger",triggerPoint + "_" + name);
+            Log.v("Where",isConnect);
+            Cursor c = getActivity().getContentResolver().query(uri, null, where, args, null);
+            Log.v("Duplicates", String.valueOf(c.getCount()));
+            if(c.moveToNext()){
+                Toast.makeText(getActivity(),"There is already a proile for this trigger",Toast.LENGTH_LONG).show();
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        return false;
+    }
+
     private void setVolumeSeekBar(){
         final AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mediaVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
@@ -203,16 +232,18 @@ public class EditCreateLocationFragment extends DialogFragment {
 
     @OnClick(R.id.button_save)
     public void onClickSave(View view) {
-        insertRecord();
-        Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
-
-        Bundle args = new Bundle();
-        args.putString("Name",mLocationName.getText().toString());
-        args.putString("Value",mValue.getSelectedItem().toString());
-        if(mListener!=null){
-            mListener.onListen(args);
+        Log.v("Save","sdds");
+        if(!checkForDuplicates()) {
+            insertRecord();
+            Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
+            Bundle args = new Bundle();
+            args.putString("Name", mLocationName.getText().toString());
+            args.putString("Value", mValue.getSelectedItem().toString());
+            if (mListener != null) {
+                mListener.onListen(args);
+            }
+            this.dismiss();
         }
-        this.dismiss();
     }
 
 }

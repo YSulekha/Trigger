@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -28,6 +31,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -71,6 +75,14 @@ public class MainFragment_bac extends Fragment implements
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
+    @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
+    @BindView(R.id.wifi_disable) FloatingActionButton wifiDisable;
+    @BindView(R.id.bluetooth_enable)FloatingActionButton bluetoothEnable;
+    @BindView(R.id.bluetooth_disable)FloatingActionButton bluetoothDisable;
+    @BindView(R.id.location_enable)FloatingActionButton locationEnable;
+    @BindView(R.id.floatingActionMenu)FloatingActionMenu floatingActionMenu;
+    @BindView(R.id.toolbar)Toolbar toolbar;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,18 +99,72 @@ public class MainFragment_bac extends Fragment implements
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
-                addApi(LocationServices.API)
+                addApi(LocationServices.API).
+                addApi( Places.PLACE_DETECTION_API )
                 .build();
 
-        EditText search = (EditText) getActivity().findViewById(R.id.toolbarText);
+        EditText search = (EditText) rootview.findViewById(R.id.toolbarText);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onClickOfSearchIcon();
             }
         });
+
+        wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
+        bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
+        locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
+        wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
+        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));
+
         return rootview;
 
+    }
+
+    public View.OnClickListener getOnClick(final FloatingActionMenu fm){
+        FloatingActionButton b;
+        return new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(v.getId() == R.id.wifi_enable){
+                    Toast t = Toast.makeText(getActivity(),"Wifi Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("WIFI");
+                }
+                else if(v.getId() == R.id.bluetooth_enable){
+                    Toast t = Toast.makeText(getActivity(),"bluetooth Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("BLUETOOTH");
+                }
+                else if(v.getId() == R.id.location_enable){
+                    Toast t = Toast.makeText(getActivity(),"Add a location:By addingPin or Search for a location",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    // showEditDialog("LOCATION");
+                }
+                if(v.getId() == R.id.wifi_disable){
+                    Toast t = Toast.makeText(getActivity(),"Wifi Disable Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("WIFI DISABLE");
+                }
+                if(v.getId() == R.id.bluetooth_disable){
+                    Toast t = Toast.makeText(getActivity(),"Bluetooth Disable Clicked",Toast.LENGTH_SHORT);
+                    t.show();
+                    fm.close(true);
+                    showEditDialog("BLUETOOTH DISABLE");
+                }
+            }
+        };
+    }
+
+    private void showEditDialog(String title) {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title,false,null);
+        editNameDialogFragment.show(fm, title);
     }
 
     @Override
