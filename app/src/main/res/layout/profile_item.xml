@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_orange_light"
     android:layout_margin="8dp">
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/profile_image"
+        android:src="@drawable/ic_add_location_black_24dp"
+        android:layout_centerVertical="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_triggerName"
+        android:layout_toRightOf="@id/profile_image"
+        android:layout_marginLeft="16dp"
         android:layout_alignParentTop="true"
-        android:text = "WIFI_SHIVA"
-        android:textColor="@color/accent"
+        android:text="FFF"
+        android:textColor="@color/colorPrimaryDark"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textStyle="bold"
         android:padding="8dp"
         />
 
@@ -20,9 +32,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id = "@+id/item_connect"
-        android:layout_alignParentRight="true"
-        android:text = "On Connect"
-        android:textColor="@color/accent"
-        android:padding="8dp"/>
+        android:layout_marginLeft="24dp"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_below="@id/item_triggerName"
+        android:layout_toRightOf="@id/profile_image"
+        android:textColor="@color/colorPrimaryDark" />
 
 </RelativeLayout>

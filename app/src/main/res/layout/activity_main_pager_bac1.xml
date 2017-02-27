@@ -27,7 +27,7 @@
                 android:id="@+id/toolbarText"
                 android:background="@color/white"
                 android:outlineProvider="bounds"
-                android:hint="Where'd you like to go?"
+                android:hint="@string/hint_search_text"
                 android:textSize="12sp"
                 android:padding="10dp"
                 android:editable="false"

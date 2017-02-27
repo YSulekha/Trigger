@@ -4,9 +4,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,17 +20,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.adapter.ProfileAdapter;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.touch_helper.TouchhelperCallback;
 
-/**
- * Created by aharyadi on 1/23/17.
- */
-
-public class ProfileFragment extends Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class ProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
     RecyclerView mRecyclerView;
@@ -33,7 +35,6 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
     Toolbar toolbar;
 
     private static final int LOADER_ID = 0;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,8 +50,10 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
         toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_profile);
+        TextView emptyView = (TextView)rootView.findViewById(R.id.profile_empty_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
-        mAdapter = new ProfileAdapter(getActivity(), new ProfileAdapter.OnItemClickListener() {
+        CoordinatorLayout coord = (CoordinatorLayout)rootView.findViewById(R.id.profile_coord);
+        mAdapter = new ProfileAdapter(getActivity(), emptyView,coord,new ProfileAdapter.OnItemClickListener() {
             @Override
             public void onClick(Uri uri,String trigger) {
                 if(trigger.equals("LOCATION")){
@@ -66,31 +69,42 @@ public class ProfileFragment extends Fragment implements android.app.LoaderManag
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL);
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
         ItemTouchHelper.Callback callback = new TouchhelperCallback(mAdapter,getActivity());
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(mRecyclerView);
-        getActivity().getLoaderManager().initLoader(LOADER_ID,null,this);
         return rootView;
     }
 
-
     @Override
-    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v("Inside Loader","ddd");
-        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-        //  Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
-        return new android.content.CursorLoader(getActivity(),uri,null,null,null,null);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.v("InsideOnActivityCreted", "hhh");
+        getLoaderManager().initLoader(LOADER_ID, null,this);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v("Inside Loader","ddd");
+        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+        //  Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
+        return new CursorLoader(getActivity(),uri,null,null,null,null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
-
-
 }

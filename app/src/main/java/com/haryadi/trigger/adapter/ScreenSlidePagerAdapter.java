@@ -26,6 +26,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
                 return new ProfileFragment();
             case 1:
                 return new MainFragment_bac();
+
         }
         return null;
     }

@@ -2,16 +2,24 @@ package com.haryadi.trigger.fragment;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +39,6 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,7 +46,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.haryadi.trigger.R;
@@ -72,21 +82,35 @@ public class MainFragment_bac extends Fragment implements
     ArrayList<Geofence> mGeofenceList = new ArrayList<>();
     LatLng searchPlace;
 
+    boolean submitPressed = false;
+
+    ArrayList<MarkerOptions> markers = new ArrayList<>();
+
+    public static final int REQUEST_ENABLE_BT = 201;
+
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    public static final String SAVE_MAP_STATE = "mapview";
+    public static final String SAVE_MARKER = "marker";
 
-    @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
-    @BindView(R.id.wifi_disable) FloatingActionButton wifiDisable;
-    @BindView(R.id.bluetooth_enable)FloatingActionButton bluetoothEnable;
-    @BindView(R.id.bluetooth_disable)FloatingActionButton bluetoothDisable;
-    @BindView(R.id.location_enable)FloatingActionButton locationEnable;
-    @BindView(R.id.floatingActionMenu)FloatingActionMenu floatingActionMenu;
-    @BindView(R.id.toolbar)Toolbar toolbar;
+    @BindView(R.id.wifi_enable)
+    FloatingActionButton wifiEnable;
+    @BindView(R.id.bluetooth_enable)
+    FloatingActionButton bluetoothEnable;
+    @BindView(R.id.location_enable)
+    FloatingActionButton locationEnable;
+    @BindView(R.id.floatingActionMenu)
+    FloatingActionMenu floatingActionMenu;
+    //   @BindView(R.id.toolbar)Toolbar toolbar;
+    @BindView(R.id.coord)
+    CoordinatorLayout layout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // setRetainInstance(true);
     }
+
 
     @Nullable
     @Override
@@ -94,14 +118,19 @@ public class MainFragment_bac extends Fragment implements
         View rootview = (ViewGroup) inflater.inflate(
                 R.layout.fragment_loc, container, false);
         ButterKnife.bind(this, rootview);
-        mMapView.onCreate(savedInstanceState);
+        /*  if(savedInstanceState==null) {
+        mMapView.onCreate(null);
         mMapView.getMapAsync(this);
+        // }
+        // else{
+//            mMapView.onCreate(savedInstanceState.getBundle(SAVE_MAP_STATE));
+        //          mMapView.getMapAsync(this);
+        //}*/
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
                 addApi(LocationServices.API).
-                addApi( Places.PLACE_DETECTION_API )
-                .build();
+                build();
 
         EditText search = (EditText) rootview.findViewById(R.id.toolbarText);
         search.setOnClickListener(new View.OnClickListener() {
@@ -110,52 +139,55 @@ public class MainFragment_bac extends Fragment implements
                 onClickOfSearchIcon();
             }
         });
-
+        floatingActionMenu.setClosedOnTouchOutside(true);
         wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
         bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
         locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
-        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));
-
         return rootview;
 
     }
 
-    public View.OnClickListener getOnClick(final FloatingActionMenu fm){
+    public void checkIfBluetoothEnabled(Context context) {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter != null) {
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                showEditDialog(getString(R.string.bluetooth));
+            }
+        }
+    }
+
+    public void checkIfWifiEnabled(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            if (!wifiManager.isWifiEnabled()) {
+                // Intent enableBtIntent = new Intent(WifiManager.AC);
+                showAlertDialog();
+            } else {
+                showEditDialog(getString(R.string.wifi));
+            }
+        }
+    }
+
+    public View.OnClickListener getOnClick(final FloatingActionMenu fm) {
         FloatingActionButton b;
         return new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if(v.getId() == R.id.wifi_enable){
-                    Toast t = Toast.makeText(getActivity(),"Wifi Clicked",Toast.LENGTH_SHORT);
+                if (v.getId() == R.id.wifi_enable) {
+                    fm.close(true);
+                    checkIfWifiEnabled(getActivity());
+                } else if (v.getId() == R.id.bluetooth_enable) {
+                    fm.close(true);
+                    checkIfBluetoothEnabled(getActivity());
+
+                } else if (v.getId() == R.id.location_enable) {
+                    Toast t = Toast.makeText(getActivity(), getString(R.string.location_msg), Toast.LENGTH_SHORT);
                     t.show();
                     fm.close(true);
-                    showEditDialog("WIFI");
-                }
-                else if(v.getId() == R.id.bluetooth_enable){
-                    Toast t = Toast.makeText(getActivity(),"bluetooth Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("BLUETOOTH");
-                }
-                else if(v.getId() == R.id.location_enable){
-                    Toast t = Toast.makeText(getActivity(),"Add a location:By addingPin or Search for a location",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    // showEditDialog("LOCATION");
-                }
-                if(v.getId() == R.id.wifi_disable){
-                    Toast t = Toast.makeText(getActivity(),"Wifi Disable Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("WIFI DISABLE");
-                }
-                if(v.getId() == R.id.bluetooth_disable){
-                    Toast t = Toast.makeText(getActivity(),"Bluetooth Disable Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("BLUETOOTH DISABLE");
                 }
             }
         };
@@ -163,7 +195,7 @@ public class MainFragment_bac extends Fragment implements
 
     private void showEditDialog(String title) {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title,false,null);
+        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title, false, null);
         editNameDialogFragment.show(fm, title);
     }
 
@@ -176,14 +208,44 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onResume() {
-        mMapView.onResume();
         super.onResume();
+        mMapView.onResume();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.v("InsideOnActivityCreted", "hhh");
+        if(savedInstanceState==null) {
+            mMapView.onCreate(null);
+            mMapView.getMapAsync(this);
+        }
+        else{
+            mMapView.onCreate(savedInstanceState.getBundle(SAVE_MAP_STATE));
+            mMapView.getMapAsync(this);
+        }
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey(SAVE_MARKER)){
+                markers = savedInstanceState.getParcelableArrayList(SAVE_MARKER);
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.v("OnSave","jjjj");
+        Bundle mapState = new Bundle();
+        mMapView.onSaveInstanceState(mapState);
+        outState.putParcelable(SAVE_MAP_STATE,mapState);
+        outState.putParcelableArrayList(SAVE_MARKER,markers);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onPause() {
-        mMapView.onPause();
         super.onPause();
+        mMapView.onPause();
+
     }
 
     @Override
@@ -196,39 +258,125 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onDestroy() {
-        mMapView.onDestroy();
         super.onDestroy();
+        mMapView.onDestroy();
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            getActivity(), R.raw.map_style));
+
+            if (!success) {
+                Log.e("Style", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("Style", "Can't find style. Error: ", e);
+        }
         map = googleMap;
-        map.animateCamera(CameraUpdateFactory.zoomTo(14.0f));
+        map.getUiSettings().setMyLocationButtonEnabled(true);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            map.setMyLocationEnabled(true);
+        }
+        map.setPadding(5,480,5,5);
+        map.animateCamera(CameraUpdateFactory.zoomTo(1.0f));
         map.setOnMapLongClickListener(this);
+        if(markers.size()>0){
+            Log.v("ActivityCreate", String.valueOf(markers.size()));
+            for(int i=0;i<markers.size();i++){
+                Log.v("hhh", String.valueOf(markers.size()));
+                MarkerOptions latLng = markers.get(i);
+                BitmapDescriptor defaultMarker =
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                Marker marker = map.addMarker(latLng);
+                drawGeofence(marker);
+            }
+            map.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+        }
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.v("Connected", "Inside");
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.v("Connected", "InsideIf");
-            //requestPermissions();
-            requestPermissions(
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    MY_PERMISSIONS_REQUEST_LOCATION);
-            return;
+            requestPermission();
         } else {
-            Log.v("Connected", "InsideElse");
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (mLastLocation != null) {
-                Log.v("last Location", "kk");
                 map.setMyLocationEnabled(true);
                 LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                //    map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
-                //   map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        latLng, 18));
+                        latLng, 14));
             }
+
+        }
+    }
+
+    public void showAlertDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                getActivity());
+
+        // set title
+        alertDialogBuilder.setTitle("Wifi Settings");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Do you want to enable WIFI ?")
+                .setCancelable(false)
+                .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        //enable wifi
+                        WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+                        wifiManager.setWifiEnabled(true);
+                        showEditDialog(getString(R.string.wifi));
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        //disable wifi
+                        Log.v("Result","canceled");
+                        Toast.makeText(getActivity(),"To set the trigger wifi should be on.Please " +
+                                "enable the wifi and try again",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+
+    public void requestPermission(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Snackbar.make(layout, "Permission reqd to access current location",
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction("OK", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            requestPermissions(
+                                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                    MY_PERMISSIONS_REQUEST_LOCATION);
+                        }
+                    })
+                    .show();
+        } else {
+
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
         }
     }
 
@@ -239,31 +387,27 @@ public class MainFragment_bac extends Fragment implements
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
-                Log.v("dsdd", String.valueOf(grantResults.length));
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    Log.v("Location", "granted");
                     if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                       //  Log.v("Connected_else", mLastLocation.getLatitude() + mLastLocation.getProvider());
-                        Log.v("Location", "granted");
                         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                         if (mLastLocation != null) {
-                            Log.v("last Location", mLastLocation.toString());
                             LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                             //  map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
                             //    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
                             //  map.animateCamera(cameraUpdate);
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    latLng, 18));
+                                    latLng, 12));
                         }
                         return;
                     }
 
                 } else {
-                    Log.v("InsideElse", "OnResult");
+                    requestPermission();
                 }
-                return;
+                break;
             }
         }
     }
@@ -293,7 +437,6 @@ public class MainFragment_bac extends Fragment implements
     }
 
     public void populateGeoFenceList() {
-        Log.v("Populate", "Geofence");
         for (Map.Entry<String, LatLng> entry : Constants.BAY_AREA_LANDMARKS.entrySet()) {
             mGeofenceList.add(new Geofence.Builder().
                     setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER).
@@ -318,14 +461,12 @@ public class MainFragment_bac extends Fragment implements
     }
 
     public PendingIntent getPendingIntent() {
-        Log.v("pendingIntent", "Geofence");
         Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
         PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent;
     }
 
     public GeofencingRequest createGeofenceReq(String name,String transition) {
-        Log.v("GeofenceReq", "Geofence");
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         //builder.addGeofences(mGeofenceList);
         builder.addGeofence(createGeofenceObject(name,transition));
@@ -338,15 +479,12 @@ public class MainFragment_bac extends Fragment implements
     }
 
     public void addToGeoFence(String name, String transition) {
-        Log.v("addToGeofence", "Geofence");
-       // populateGeoFenceList();
-      //  createGeofenceObject(name);
+
         try {
             LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, createGeofenceReq(name,transition), getPendingIntent()).setResultCallback(this);
         } catch (SecurityException ex) {
             Log.v("No permission", "dds");
         }
-
     }
 
     //Method called when geoFence is added
@@ -363,9 +501,8 @@ public class MainFragment_bac extends Fragment implements
     //searching location
     public void onClickOfSearchIcon() {
         try {
-            Log.v("Inside Search","adad");
             Intent intent =
-                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                             .build(getActivity());
             startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
         } catch (GooglePlayServicesRepairableException e) {
@@ -377,37 +514,62 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v("Inside Result",String.valueOf(requestCode));
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
                 searchPlace = place.getLatLng();
-                Log.v("SearchAct", "Place: " + place.getName());
                 FragmentManager fm = getActivity().getSupportFragmentManager();
-
                 EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, this);
                 editNameDialogFragment.show(fm, "LOCATION");
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(getActivity(), data);
                 Log.v("SearchAct", status.getStatusMessage());
-
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
+            }
+        }
+        if(requestCode == REQUEST_ENABLE_BT){
+            if(resultCode == RESULT_OK){
+                showEditDialog(getString(R.string.bluetooth));
+            }
+            if(resultCode == RESULT_CANCELED){
+                Toast.makeText(getActivity(),"To set the trigger bluetooth should be on.Please " +
+                        "enable the bluetooth and try again",Toast.LENGTH_LONG).show();
             }
         }
     }
 
     @Override
     public void onListen(Bundle args) {
-        Log.v("Inside Listen", "ddsf");
         BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-        Marker marker = map.addMarker(new MarkerOptions()
+        MarkerOptions markerOptions = new MarkerOptions()
                 .position(searchPlace)
                 .title(args.getString("Name"))
                 .snippet(args.getString("Value"))
-                .icon(defaultMarker));
+                .icon(defaultMarker);
+        Marker marker = map.addMarker(markerOptions);
+        markers.add(markerOptions);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(searchPlace.latitude,searchPlace.longitude), 12));
+        Log.v("OnListen", String.valueOf(searchPlace.latitude));
         Constants.BAY_AREA_LANDMARKS.put(args.getString("Name"), searchPlace);
         addToGeoFence(args.getString("Name"),args.getString("Value"));
+        drawGeofence(marker);
+    }
+    // Draw Geofence circle on GoogleMap
+    private Circle geoFenceLimits;
+    private void drawGeofence(Marker marker) {
+        if ( geoFenceLimits != null ){
+            geoFenceLimits.remove();
+        }
+
+        CircleOptions circleOptions = new CircleOptions()
+                .center( marker.getPosition())
+                .strokeColor(Color.BLACK)
+                .fillColor( Color.TRANSPARENT )
+                .radius( Constants.GEOFENCE_RADIUS_IN_METERS )
+                .strokeWidth( 10 );
+        geoFenceLimits = map.addCircle( circleOptions );
     }
 }

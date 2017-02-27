@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.GeofenceStatusCodes;
+import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.service.GeofenceTrasitionService;
 
 import java.util.ArrayList;
@@ -21,6 +22,29 @@ import java.util.List;
 import java.util.Set;
 
 public class ChangeSettings {
+
+    public  static final String[] TRIGGER_COLUMNS = {
+            TriggerContract.TriggerEntry._ID,
+            TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME,
+            TriggerContract.TriggerEntry.COLUMN_NAME,
+            TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,
+            TriggerContract.TriggerEntry.COLUMN_CONNECT,
+            TriggerContract.TriggerEntry.COLUMN_ISWIFION,
+            TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON,
+            TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,
+            TriggerContract.TriggerEntry.COLUMN_RINGVOL
+    };
+
+    // these indices must match the projection
+    public static final int INDEX_TRIGGER_ID = 0;
+    public static final int INDEX_TRIGGER_NAME = 1;
+    public static final int INDEX_NAME = 2;
+    public static final int INDEX_TRIGGER_POINT = 3;
+    public static final int INDEX_CONNECT = 4;
+    public static final int INDEX_ISWIFION = 5;
+    public static final int INDEX_ISBLUETOOTHON = 6;
+    public static final int INDEX_MEDIAVOL = 7;
+    public static final int INDEX_RINGVOL = 8;
 
     public static void changeBluetoothSetting(Context context, Boolean enable){
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -39,6 +63,7 @@ public class ChangeSettings {
 
     public static void changeWifiSettings(Context context,boolean enable){
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         Log.v("IsWifiEnabled", String.valueOf(wifiManager.isWifiEnabled()));
         String name = wifiInfo.getSSID();
@@ -65,7 +90,9 @@ public class ChangeSettings {
     }
     public static void changeRingVolume(Context context,int progress){
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_RING,progress,0);
+        audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        Log.v("setVolume", String.valueOf(audioManager.getStreamVolume(AudioManager.STREAM_RING)));
+       // audioManager.setStreamVolume(AudioManager.STREAM_RING,progress,0);
     }
     public static ArrayList<String> getConfiguredWifi(Context context){
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -122,5 +149,12 @@ public class ChangeSettings {
             default:
                 return "Unknown error.";
         }
+    }
+
+    public static void writeToSharedPref(Context context,long id){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putLong(GeofenceTrasitionService.SHARED_LAST_TRIGGER, id);
+        edit.commit();
     }
 }

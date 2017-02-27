@@ -22,7 +22,7 @@ public class TouchhelperCallback extends ItemTouchHelper.Callback {
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START|ItemTouchHelper.END;
+        int swipeFlags = ItemTouchHelper.START;
         return makeMovementFlags(dragFlags,swipeFlags);
     }
 
@@ -40,10 +40,7 @@ public class TouchhelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        if(direction == ItemTouchHelper.END){
-            mAdapter.onItemStatusChanged(viewHolder.getAdapterPosition());
-        }
-        else if(direction == ItemTouchHelper.START){
+        if(direction == ItemTouchHelper.START){
             mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
         }
     }

@@ -31,7 +31,7 @@ public class GeofenceTrasitionService extends IntentService {
     public static final int GEOFENCE_NOTIFICATION_ID = 0;
     public static final String SHARED_LAST_WIFI = "wifi_name";
     public static final String SHARED_LAST_BLUETOOTH = "bluetooth_name";
-
+    public static final String SHARED_LAST_TRIGGER= "last_trigger";
 
     public GeofenceTrasitionService() {
         super("GeofenceTrasitionService");
@@ -72,7 +72,7 @@ public class GeofenceTrasitionService extends IntentService {
         Log.v("CheckDatabase", String.valueOf(trigger.size()));
         for(Geofence geofence : trigger){
             String name = geofence.getRequestId();
-            String connect = "connect";
+            String connect = "Connect";
             Log.v("InsideFor",name);
             if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
                 connect = "Connect";
@@ -80,13 +80,15 @@ public class GeofenceTrasitionService extends IntentService {
             else{
                 connect="Disconnect";
             }
+            Log.v("Inside Service",connect);
             Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
             String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
-                    TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT + " = ?" + " AND "+
+                    TriggerContract.TriggerEntry.COLUMN_NAME + " = ?" + " AND "+
                     TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
-            String[] args = new String[]{"LOCATION" + "_" + name,connect};
+          //  String[] args = new String[]{"LOCATION" + "_" + name,connect};
+            String[] args = new String[]{name,connect};
             Cursor c = getContentResolver().query(uri,null,where,args,null);
-            Log.v("InsideFor", String.valueOf(c.getCount()));
+            Log.v("InsideForCount", String.valueOf(c.getCount()));
             if(c.moveToNext()){
                 if (c != null) {
                     Log.v("Inside enabled", "jhh");
@@ -106,7 +108,11 @@ public class GeofenceTrasitionService extends IntentService {
                     Log.v("Volume", String.valueOf(c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL))));
                     ChangeSettings.changeMediaVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
                     ChangeSettings.changeRingVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
+                    ChangeSettings.writeToSharedPref(this,c.getLong(c.getColumnIndex(TriggerContract.TriggerEntry._ID)));
+                    TriggerActivity.notifyWidgets(this);
+
                 }
+                c.close();
                 Log.v("HasData","true");
                 Log.v("FasDataC", String.valueOf(c.getCount()));
             }

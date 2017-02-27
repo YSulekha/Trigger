@@ -1,17 +1,18 @@
 package com.haryadi.trigger;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 import com.haryadi.trigger.adapter.ScreenSlidePagerAdapter;
+import com.haryadi.trigger.data.TriggerContract;
+import com.haryadi.trigger.fragment.EditCreateLocationFragment;
 import com.haryadi.trigger.fragment.EditCreateProfileFragment;
 
 import butterknife.BindView;
@@ -20,80 +21,51 @@ import butterknife.ButterKnife;
 public class TriggerActivity extends AppCompatActivity {
 
     @BindView(R.id.viewPager) ViewPager mPager;
-    private ScreenSlidePagerAdapter mAdapter;
 
- /*   @BindView(R.id.wifi_enable)FloatingActionButton wifiEnable;
-    @BindView(R.id.wifi_disable) FloatingActionButton wifiDisable;
-    @BindView(R.id.bluetooth_enable)FloatingActionButton bluetoothEnable;
-    @BindView(R.id.bluetooth_disable)FloatingActionButton bluetoothDisable;
-    @BindView(R.id.location_enable)FloatingActionButton locationEnable;
-    @BindView(R.id.floatingActionMenu)FloatingActionMenu floatingActionMenu;
-    @BindView(R.id.toolbar)Toolbar toolbar;*/
-
+    public static final String ACTION_DATA_UPDATED = "com.haryadi.trigger.ACTION_DATA_UPDATED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_pager);
         ButterKnife.bind(this);
-      //  setSupportActionBar(toolbar);
 
-        mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mAdapter);
-   /*     wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
-        wifiDisable.setOnClickListener(getOnClick(floatingActionMenu));
-        bluetoothDisable.setOnClickListener(getOnClick(floatingActionMenu));*/
-    }
-
-    public View.OnClickListener getOnClick(final FloatingActionMenu fm){
-        FloatingActionButton b;
-        return new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if(v.getId() == R.id.wifi_enable){
-                    Toast t = Toast.makeText(getApplicationContext(),"Wifi Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("WIFI");
-                }
-                else if(v.getId() == R.id.bluetooth_enable){
-                    Toast t = Toast.makeText(getApplicationContext(),"bluetooth Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("BLUETOOTH");
-                }
-                else if(v.getId() == R.id.location_enable){
-                    Toast t = Toast.makeText(getApplicationContext(),"Add a location:By addingPin or Search for a location",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                   // showEditDialog("LOCATION");
-                }
-                if(v.getId() == R.id.wifi_disable){
-                    Toast t = Toast.makeText(getApplicationContext(),"Wifi Disable Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("WIFI DISABLE");
-                }
-                if(v.getId() == R.id.bluetooth_disable){
-                    Toast t = Toast.makeText(getApplicationContext(),"Bluetooth Disable Clicked",Toast.LENGTH_SHORT);
-                    t.show();
-                    fm.close(true);
-                    showEditDialog("BLUETOOTH DISABLE");
-                }
+        getWindow().getDecorView().setFitsSystemWindows(true);
+        Intent intent = getIntent();
+        String frag = getIntent().getStringExtra("Trigger");
+        if(frag!=null){
+            if(intent.hasExtra("IdValue") && intent.hasExtra("triggerPoint")) {
+                openFrag(getIntent());
             }
-        };
+        }
+      //  Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.slide_right);
+        //getWindow().setEnterTransition(transition);
+
+        //  setSupportActionBar(toolbar);
+
+        ScreenSlidePagerAdapter mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mAdapter);
+        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mPager.setCurrentItem(1);
     }
 
-    private void showEditDialog(String title) {
-        FragmentManager fm = getSupportFragmentManager();
-        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title,false,null);
-        editNameDialogFragment.show(fm, title);
+    public void openFrag(Intent intent){
+        long id = intent.getLongExtra("IdValue",-1);
+        String trigger = intent.getStringExtra("triggerPoint");
+        Uri uri = TriggerContract.TriggerEntry.buildTaskUri(id);
+        if(trigger.equals("LOCATION")){
+            FragmentManager fm = getSupportFragmentManager();
+            EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null);
+            editLocationDialogFragment.show(fm, "Edit");
+        }
+        else {
+            FragmentManager fm = getSupportFragmentManager();
+            EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit", true, uri);
+            editNameDialogFragment.show(fm, "Edit");
+        }
     }
 
-    @Override
+ /*   @Override
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
@@ -103,7 +75,7 @@ public class TriggerActivity extends AppCompatActivity {
             // Otherwise, select the previous step.
             mPager.setCurrentItem(mPager.getCurrentItem() - 1);
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -123,5 +95,10 @@ public class TriggerActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void notifyWidgets(Context mContext) {
+        Intent intent = new Intent(ACTION_DATA_UPDATED);
+        mContext.sendBroadcast(intent);
     }
 }

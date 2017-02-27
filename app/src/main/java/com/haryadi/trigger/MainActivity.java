@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements
 GoogleMap.OnMarkerClickListener, ResultCallback<Status>
          {
 
-    private SupportMapFragment mapFragment;
+
     private GoogleMap map;
 
     public static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 1;
@@ -156,7 +156,8 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
     }
 
     private void initGMaps(){
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
@@ -409,7 +410,7 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
                 .strokeColor(Color.BLACK)
                 .fillColor( Color.TRANSPARENT )
                 .radius( GEOFENCE_RADIUS )
-                .strokeWidth( 10 );;
+                .strokeWidth( 10 );
         geoFenceLimits = map.addCircle( circleOptions );
     }
 

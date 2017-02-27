@@ -3,19 +3,15 @@
     package="com.haryadi.trigger">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <uses-feature android:name="android.hardware.location.network" />
-
-    <uses-library
-        android:name="com.google.android.maps"
-        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -27,45 +23,69 @@
             android:name=".TriggerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".SplashActivity"
+            android:theme ="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name=".data.TriggerProvider"
             android:authorities="com.haryadi.trigger"
-            android:exported="false"/>
+            android:exported="false" />
 
-        <receiver android:name=".service.WifiConnectivityReceiver"
+        <receiver
+            android:name=".service.WifiConnectivityReceiver"
             android:enabled="true">
             <intent-filter>
-              <!--  <action android:name="android.net.wifi.STATE_CHANGE"/>-->
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <!--  <action android:name="android.net.wifi.STATE_CHANGE"/>-->
+                <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 
-
-        <receiver android:name=".service.BluetoothConnectivityReceiver"
+        <receiver
+            android:name=".service.BluetoothConnectivityReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
-                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".widget.TriggerAppWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.haryadi.trigger.ACTION_DATA_UPDATED"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidgetprovider"/>
+        </receiver>
+
+        <service android:name=".widget.AppWidgetUpdateService"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA_MxgX4LJ5x2An4Xa3ZYzmGjXcHB6rsDo"/>
+            android:value="AIzaSyA_MxgX4LJ5x2An4Xa3ZYzmGjXcHB6rsDo" />
         <meta-data
-        android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-        <service android:name=".service.GeofenceTrasitionService"/>
-        <service android:name=".service.ChangeSettingsIntentService"
-            android:exported="false"/>
+        <service android:name=".service.GeofenceTrasitionService" />
+        <service
+            android:name=".service.ChangeSettingsIntentService"
+            android:exported="false" />
+
+        <uses-library
+            android:name="com.google.android.maps"
+            android:required="true" />
 
 
     </application>

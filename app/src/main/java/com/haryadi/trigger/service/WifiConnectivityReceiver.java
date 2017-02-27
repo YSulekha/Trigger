@@ -22,9 +22,7 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver {
             Log.v("WIFI TYPE",netInfo.getTypeName());
             Log.v("WIFI TYPE", String.valueOf(ConnectivityManager.TYPE_WIFI == netInfo.getType()));
             Log.v("WIFI TYPE", String.valueOf(netInfo.isConnected()));
-           // if (netInfo.isConnected()) {
             if(ConnectivityManager.TYPE_WIFI == netInfo.getType() && netInfo.isConnected()){
-
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wifiInfo1 = wifiManager.getConnectionInfo();
                 Log.v("Supplicant state", String.valueOf(wifiInfo1.getSupplicantState()));
@@ -40,7 +38,7 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver {
                     Log.v("wifi Connect", wifiInfo.getSSID());
                     Intent serviceIntent = new Intent(context, ChangeSettingsIntentService.class);
                     serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT, true);
-                    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME, "WIFI" + "_" + wifiInfo.getSSID());
+                    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME, wifiInfo.getSSID());
                     context.startService(serviceIntent);
                 }
 
@@ -53,52 +51,12 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver {
                 Log.v("wifi DisConnect",wifiName);
                 WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
                 Log.v("STATE CHANGE", "disconnectnetwork");
-             //   ChangeSettings.changeBluetoothSetting(context, true);
-               // ChangeSettings.changeSoundSettings(context, true);
                 Intent serviceIntent = new Intent(context,ChangeSettingsIntentService.class);
                 intent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT,false);
-                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,"WIFI DISABLE"+"_"+wifiName);
+                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,wifiName);
                 context.startService(serviceIntent);
-//                intent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,wifiInfo.getSSID());
             }
         }
-
-     /*   ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-
-        Log.v("ActiviNetInfo",activeNetInfo.toString());
-
-        if(activeNetInfo != null && activeNetInfo.getType()==ConnectivityManager.TYPE_WIFI) {
-            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            if (wifiManager.isWifiEnabled()) {
-                Cursor c = getData(wifiInfo.getSSID(), context);
-                if (c != null) {
-                    Log.v("Inside enabled", "jhh");
-                    String bluetooth = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON));
-                    if(bluetooth.equals("Turn On")){
-                        ChangeSettings.changeBluetoothSetting(context, true);
-                    }
-                    else{
-                        ChangeSettings.changeBluetoothSetting(context, false);
-                    }
-                    Log.v("Volume", String.valueOf(c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL))));
-                    ChangeSettings.changeMediaVolume(context,c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
-                    ChangeSettings.changeRingVolume(context,c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
-                }
-                //  }
-            } else {
-                Log.v("Inside disabled", "khh");
-                ChangeSettings.changeBluetoothSetting(context, true);
-                ChangeSettings.changeSoundSettings(context, true);
-            }
-        }
-       else{
-            Log.v("Inside enabled", "ghh");
-            ChangeSettings.changeBluetoothSetting(context, true);
-            ChangeSettings.changeSoundSettings(context, true);
-        }*/
 
     }
 

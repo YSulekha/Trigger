@@ -47,6 +47,7 @@ public class MainFragment extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
         GoogleMap.OnMapClickListener,
+
         GoogleMap.OnMarkerClickListener, ResultCallback<Status> {
 
     private SupportMapFragment mapFragment;
@@ -148,7 +149,7 @@ public class MainFragment extends Fragment implements
 
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         map.setTrafficEnabled(true);
-        //  map.setMyLocationEnabled( true );
+        // map.setMyLocationEnabled( true );
         map.getUiSettings().setZoomControlsEnabled(true);
     }
 
@@ -358,7 +359,7 @@ public class MainFragment extends Fragment implements
                 .fillColor(Color.TRANSPARENT)
                 .radius(GEOFENCE_RADIUS)
                 .strokeWidth(10);
-        ;
+
         geoFenceLimits = map.addCircle(circleOptions);
 
          /*    CameraPosition cameraPosition = new CameraPosition.Builder()

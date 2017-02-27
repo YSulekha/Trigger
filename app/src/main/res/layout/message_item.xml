@@ -8,7 +8,7 @@
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/etSnippet"
+        android:layout_alignStart="@+id/etSnippet"
         android:paddingTop="20dp"
         android:hint="Name"
 

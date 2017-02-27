@@ -15,9 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.haryadi.trigger.R;
@@ -28,26 +29,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-/**
- * Created by aharyadi on 2/6/17.
- */
 
 public class EditCreateLocationFragment extends DialogFragment {
 
-    @BindView(R.id.media_seekbar)
-    SeekBar mediaVolumeBar;
+    @BindView(R.id.media_seekbar) SeekBar mediaVolumeBar;
     @BindView(R.id.ring_seekbar) SeekBar ringVolumeBar;
-    @BindView(R.id.content_isbluetoothon)
-    Spinner mIsBluetoothOn;
+    @BindView(R.id.content_isbluetoothon) Spinner mIsBluetoothOn;
     @BindView(R.id.content_iswifion) Spinner mIsWifiOn;
-    @BindView(R.id.button_save)
-    Button saveButton;
-    @BindView(R.id.location_wifi_name)
-    EditText mLocationName;
-    @BindView(R.id.location_triggerValue)
-    Spinner mValue;
-    @BindView(R.id.dialog_title)
-    TextView textTitle;
+    @BindView(R.id.button_save) Button saveButton;
+    @BindView(R.id.location_wifi_name) EditText mLocationName;
+    @BindView(R.id.isConnect) RadioGroup radioGroup;
+    @BindView(R.id.dialog_radio_connect) RadioButton radioConnect;
+    @BindView(R.id.dialog_radio_disconnect) RadioButton radioDisConnect;
     String triggerPoint;
     ArrayAdapter<CharSequence> optionsAdapter;
     ArrayAdapter<CharSequence> locationsOptionsAdapter;
@@ -56,23 +49,21 @@ public class EditCreateLocationFragment extends DialogFragment {
     Uri mUri;
     static locationListener mListener;
 
-    public EditCreateLocationFragment(){
+    public EditCreateLocationFragment() {
 
     }
 
-    public static interface locationListener{
+    public interface locationListener {
         void onListen(Bundle args);
     }
 
-    public static EditCreateLocationFragment newInstance(String triggerPoint, boolean isEdit, Uri uri,locationListener list){
+    public static EditCreateLocationFragment newInstance(String triggerPoint, boolean isEdit, Uri uri, locationListener list) {
         EditCreateLocationFragment frag = new EditCreateLocationFragment();
         Bundle args = new Bundle();
         mListener = list;
-        Log.v("titleAct",triggerPoint);
-        args.putString("title",triggerPoint);
-        args.putBoolean("isEdit",isEdit);
-        Log.v("isEdit", String.valueOf(isEdit));
-        if(uri !=null) {
+        args.putString("title", triggerPoint);
+        args.putBoolean("isEdit", isEdit);
+        if (uri != null) {
             args.putString("Uri", uri.toString());
         }
         frag.setArguments(args);
@@ -82,85 +73,98 @@ public class EditCreateLocationFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dialog_location,container);
+        return inflater.inflate(R.layout.fragment_dialog_location, container);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
         triggerPoint = getArguments().getString("title", "Enter Name");
         isEdit = getArguments().getBoolean("isEdit");
-        textTitle.setText(triggerPoint);
-        //   names.add("Shiv1a");
-        // names.add("Soij");
         configureViews();
-        if(isEdit){
+        if (isEdit) {
             mUri = Uri.parse(getArguments().getString("Uri"));
             configureValues(mUri);
         }
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                Log.v("OnClick", "onClick");
+                onRadioButtonClicked(checkedId);
+            }
+        });
     }
+
+    public void onRadioButtonClicked(int id) {
+        Log.v("OnClick", "onClick");
+        switch (id) {
+            case R.id.dialog_radio_connect:
+                if (radioConnect.isChecked()) {
+                    isConnect = getString(R.string.text_connect);
+                }
+                break;
+            case R.id.dialog_radio_disconnect:
+                if (radioDisConnect.isChecked()) {
+                    isConnect = getString(R.string.text_disconnect);
+                }
+                break;
+            default:
+                isConnect = getString(R.string.text_connect);
+        }
+    }
+
     private void configureViews() {
-        locationsOptionsAdapter = ArrayAdapter.createFromResource(getActivity(),R.array.location_options,android.R.layout.simple_spinner_item);
-        locationsOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mValue.setAdapter(locationsOptionsAdapter);
         setVolumeSeekBar();
-        optionsAdapter = ArrayAdapter.createFromResource(getActivity(),R.array.options,android.R.layout.simple_spinner_item);
+        radioConnect.setChecked(true);
+        optionsAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.options, android.R.layout.simple_spinner_item);
         optionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mIsBluetoothOn.setAdapter(optionsAdapter);
         mIsWifiOn.setAdapter(optionsAdapter);
     }
 
-    private void configureValues(Uri uri){
-        //long id = TriggerContract.TriggerEntry.getIdFromUri(uri);
-        Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
+    private void configureValues(Uri uri) {
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
         int pos = 0;
-        if(cursor.moveToNext()){
-            //int pos = arrayAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
-            String triggerPoint = cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
-            String value = cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_CONNECT));
-            if(value.equals("Connect")){
-                mValue.setSelection(0);
+        if (cursor.moveToNext()) {
+            String triggerPoint = cursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
+            if (cursor.getString(ChangeSettings.INDEX_CONNECT).equals(getString(R.string.text_connect))) {
+                radioConnect.setChecked(true);
+                radioGroup.setEnabled(false);
+
+            } else {
+                radioDisConnect.setChecked(true);
+                radioGroup.setEnabled(false);
             }
-            else{
-                mValue.setSelection(1);
-            }
-            mValue.setEnabled(false);
-            mLocationName.setText(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME)));
+            radioConnect.setEnabled(false);
+            radioDisConnect.setEnabled(false);
+            mLocationName.setText(cursor.getString(ChangeSettings.INDEX_NAME));
             mLocationName.setEnabled(false);
-            mIsBluetoothOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON))));
-            mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION))));
-            mediaVolumeBar.setProgress(cursor.getInt(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
-            ringVolumeBar.setProgress(cursor.getInt(cursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
+            mIsBluetoothOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISBLUETOOTHON)));
+            mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISWIFION)));
+            mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
+            ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
+            cursor.close();
         }
     }
 
     private void insertRecord() {
-        ContentValues values = new ContentValues();
-        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-        String name = mLocationName.getText().toString();
-        values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
-        values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,mediaVolumeBar.getProgress());
-        values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL,ringVolumeBar.getProgress());
-        values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
-        values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-        if(isEdit){
-            updateRecord(values);
-        }
-        else {
-            ChangeSettings.addWifiNameToSharedPreference(getActivity());
-            if(mValue.getSelectedItem().toString().equals("Enter")){
-                isConnect = "Connect";
+            ContentValues values = new ContentValues();
+            Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+            String name = mLocationName.getText().toString();
+            values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
+            values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
+            values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
+            values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
+            values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
+            if (isEdit) {
+                updateRecord(values);
+            } else {
+                values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);
+                values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
+                values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, isConnect);
+                getActivity().getContentResolver().insert(uri, values);
             }
-            else{
-                isConnect = "Disconnect";
-            }
-            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT,triggerPoint);
-            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
-            values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT,isConnect);
-            getActivity().getContentResolver().insert(uri, values);
-        }
-
     }
 
     private void updateRecord(ContentValues values) {
@@ -170,80 +174,58 @@ public class EditCreateLocationFragment extends DialogFragment {
         getActivity().getContentResolver().update(TriggerContract.TriggerEntry.CONTENT_URI, values, where, args);
     }
 
-    private boolean checkForDuplicates(){
-        Log.v("Duplicates","sff");
-        if(!isEdit) {
-            Log.v("Duplicates","sff1");
+    private boolean checkForDuplicates() {
+        if (!isEdit) {
             String name = mLocationName.getText().toString();
-            if(mValue.getSelectedItem().toString().equals("Enter")){
-                isConnect = "Connect";
-            }
-            else{
-                isConnect = "Disconnect";
-            }
             Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
             String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
                     TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME + " = ?" + " AND " +
                     TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
             String[] args = new String[]{triggerPoint + "_" + name, isConnect};
-            Log.v("Trigger",triggerPoint + "_" + name);
-            Log.v("Where",isConnect);
             Cursor c = getActivity().getContentResolver().query(uri, null, where, args, null);
-            Log.v("Duplicates", String.valueOf(c.getCount()));
-            if(c.moveToNext()){
-                Toast.makeText(getActivity(),"There is already a proile for this trigger",Toast.LENGTH_LONG).show();
+            if (c.moveToNext()) {
+                Toast.makeText(getActivity(), getString(R.string.text_duplicates), Toast.LENGTH_LONG).show();
+                c.close();
                 return true;
-            }
-            else{
+            } else {
                 return false;
             }
+
         }
         return false;
     }
 
-    private void setVolumeSeekBar(){
+    private void setVolumeSeekBar() {
         final AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mediaVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
         mediaVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
-        //    mediaVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_MUSIC,audioManager));
-        //  ringVolumeBar.setOnSeekBarChangeListener(createSeekBarChangeListener(AudioManager.STREAM_RING,audioManager));
     }
-
-  /*  private SeekBar.OnSeekBarChangeListener createSeekBarChangeListener(final int streamType,final AudioManager audioManager){
-        return new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                audioManager.setStreamVolume(streamType,progress,0);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        };
-    }*/
 
     @OnClick(R.id.button_save)
     public void onClickSave(View view) {
-        Log.v("Save","sdds");
-        if(!checkForDuplicates()) {
-            insertRecord();
-            Toast.makeText(getActivity(), "Record Saved", Toast.LENGTH_LONG).show();
-            Bundle args = new Bundle();
-            args.putString("Name", mLocationName.getText().toString());
-            args.putString("Value", mValue.getSelectedItem().toString());
-            if (mListener != null) {
-                mListener.onListen(args);
+        if (!checkForDuplicates()) {
+            if (mLocationName.getText().toString().trim().equals("")) {
+                mLocationName.setError(getString(R.string.text_required));
             }
-            this.dismiss();
+            else {
+                insertRecord();
+                Bundle args = new Bundle();
+                args.putString("Name", mLocationName.getText().toString());
+                String value;
+                if (radioGroup.getCheckedRadioButtonId() == R.id.dialog_radio_connect) {
+                    value = getString(R.string.text_enter);
+                } else {
+                    value = getString(R.string.text_exit);
+                }
+                Log.v("ClickSave",mLocationName.getText().toString()+value);
+                args.putString("Value", value);
+                if (mListener != null) {
+                    mListener.onListen(args);
+                }
+                this.dismiss();
+            }
         }
     }
-
 }

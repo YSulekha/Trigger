@@ -25,7 +25,7 @@ public class BluetoothConnectivityReceiver extends BroadcastReceiver {
                 String bluetoothName = prefs.getString(GeofenceTrasitionService.SHARED_LAST_BLUETOOTH,"No Value");
                 Intent serviceIntent = new Intent(context,ChangeSettingsIntentService.class);
                 serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT,false);
-                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,"BLUETOOTH DISABLE"+"_"+bluetoothName);
+                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,bluetoothName);
                 context.startService(serviceIntent);
                 Log.v("Bluetooth123","Disconnected");
             }
@@ -38,7 +38,7 @@ public class BluetoothConnectivityReceiver extends BroadcastReceiver {
             edit.commit();
             Intent serviceIntent = new Intent(context,ChangeSettingsIntentService.class);
             serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT,true);
-            serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME, "BLUETOOTH"+"_"+device.getName());
+            serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,device.getName());
             context.startService(serviceIntent);
             Log.v("Namebluetooth device",device.getName());
         }
@@ -47,7 +47,7 @@ public class BluetoothConnectivityReceiver extends BroadcastReceiver {
             String bluetoothName = prefs.getString(GeofenceTrasitionService.SHARED_LAST_BLUETOOTH,"No Value");
             Intent serviceIntent = new Intent(context,ChangeSettingsIntentService.class);
             serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT,false);
-            serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,"BLUETOOTH DISABLE"+"_"+bluetoothName);
+            serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,bluetoothName);
             context.startService(serviceIntent);
             Log.v("Bluetooth","Disconnected");
         }

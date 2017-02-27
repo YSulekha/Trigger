@@ -4,16 +4,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.touch_helper.ItemTouchHelperAdapter;
+import com.haryadi.trigger.utils.ChangeSettings;
 
 /**
  * Created by aharyadi on 1/25/17.
@@ -25,18 +29,37 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     Context mContext;
     Cursor mCursor;
     OnItemClickListener mListener;
+    TextView emptyView;
+    CoordinatorLayout coordinatorLayout;
+    ContentValues deleteValues;
+    int deletePosition = -1;
+    private View.OnClickListener undoListener;
 
     @Override
     public void onItemDismiss(int position) {
 
         mCursor.moveToPosition(position);
-        ContentValues deleteValues = new ContentValues();
+        deleteValues = new ContentValues();
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, mCursor.getString(ChangeSettings.INDEX_TRIGGER_NAME));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_NAME, mCursor.getString(ChangeSettings.INDEX_NAME));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, mCursor.getString(ChangeSettings.INDEX_CONNECT));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mCursor.getString(ChangeSettings.INDEX_ISBLUETOOTHON));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mCursor.getString(ChangeSettings.INDEX_ISWIFION));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mCursor.getString(ChangeSettings.INDEX_MEDIAVOL));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, mCursor.getString(ChangeSettings.INDEX_RINGVOL));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT));
+        deletePosition = position;
         long id = mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID));
         String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
                 TriggerContract.TriggerEntry._ID + " = ?";
         String[] args = new String[]{Long.toString(id)};
         mContext.getContentResolver().delete(TriggerContract.TriggerEntry.CONTENT_URI, where, args);
         notifyItemRemoved(position);
+
+        Toast.makeText(mContext,"Trigger deleted",Toast.LENGTH_LONG).show();
+        Snackbar.make(coordinatorLayout, "Trigger deleted", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", undoListener)
+                .show();
 
     }
 
@@ -50,9 +73,11 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
 
-    public ProfileAdapter(Context c, OnItemClickListener listener){
+    public ProfileAdapter(Context c, TextView textView,CoordinatorLayout layout,OnItemClickListener listener){
         mContext = c;
         mListener = listener;
+        coordinatorLayout = layout;
+        emptyView = textView;
     }
     @Override
     public ProfileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -63,35 +88,59 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-          holder.profileName.setText(mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME)));
-          holder.profileConnect.setText(mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION)));
+        String name = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME));
+        String triggerPoint = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
+          holder.profileConnect.setText(mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_CONNECT)));
+        if(triggerPoint.equals("WIFI")){
+            holder.profileName.setText(name.substring(1, name.length() - 1));
+            holder.profileImage.setImageResource(R.drawable.wifi_green);
+        }
+        else if(triggerPoint.equals("BLUETOOTH")){
+            holder.profileImage.setImageResource(R.drawable.bluetooth_green);
+            holder.profileName.setText(name);
+        }
+        else{
+            holder.profileImage.setImageResource(R.drawable.location_green);
+            holder.profileName.setText(name);
+        }
     }
 
     @Override
     public int getItemCount() {
         if(mCursor!=null){
-            Log.v("Count", String.valueOf(mCursor.getCount()));
             return mCursor.getCount();
         }
         return 0;
     }
 
     public void swapCursor(Cursor newCursor){
-        Log.v("swap Cursor","add");
         mCursor = newCursor;
         notifyDataSetChanged();
+        emptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     class ProfileViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView profileName;
         TextView profileConnect;
+        ImageView profileImage;
 
         public ProfileViewHolder(View itemView) {
             super(itemView);
             profileName = (TextView)itemView.findViewById(R.id.item_triggerName);
             profileConnect = (TextView)itemView.findViewById(R.id.item_connect);
+            profileImage = (ImageView) itemView.findViewById(R.id.profile_image);
             itemView.setOnClickListener(this);
+            undoListener = new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (deleteValues != null) {
+                        mContext.getContentResolver().insert(TriggerContract.TriggerEntry.CONTENT_URI, deleteValues);
+                        deleteValues = null;
+                    }
+                }
+            };
         }
 
         @Override
@@ -100,7 +149,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             mCursor.moveToPosition(pos);
             String triggerPoint = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
             Uri uri = TriggerContract.TriggerEntry.buildTaskUri(mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID)));
-            Log.v("Uri",uri.toString());
             mListener.onClick(uri,triggerPoint);
         }
     }

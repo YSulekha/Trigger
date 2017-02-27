@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 
 public class TriggerProvider extends ContentProvider {
@@ -50,11 +49,7 @@ public class TriggerProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String s, String[] strings1, String sort) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Log.v("Inside query", String.valueOf(uri));
-        //long id = TriggerContract.TriggerEntry.getIdFromUri(uri);
-       // Log.v("Inside query",String.valueOf(id));
         int match = sUriMatcher.match(uri);
-        Log.v("Inside query",String.valueOf(match));
         Cursor retCursor;
         switch (match) {
             case TASK:
@@ -63,7 +58,6 @@ public class TriggerProvider extends ContentProvider {
 
             case TASK_WITH_ID:
                 long id1 = TriggerContract.TriggerEntry.getIdFromUri(uri);
-                Log.v("Inside query",String.valueOf(id1));
                 String[] dateArgs = new String[]{Long.toString(id1)};
                 retCursor = db.query(TriggerContract.TriggerEntry.TABLE_NAME, projection, sIdSelection, dateArgs, null, null, sort);
                 break;

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="WIFI"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/dialog_title"
+        android:background="@color/colorAccent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NAME"
+        android:id="@+id/name"
+        android:layout_below="@id/dialog_title"
+        android:padding="8dp"
+        android:background="@color/colorPrimary"
+        />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/spinner_wifi_name"
+        android:layout_toRightOf="@id/name"
+        android:layout_below="@id/dialog_title"
+        />
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_below="@id/name"
+        android:padding="8dp"
+        android:id="@+id/isConnect"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/dialog_radio_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="onConnect"
+            android:textColor="@color/cast_intro_overlay_background_color" />
+        <RadioButton
+            android:id="@+id/dialog_radio_disconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="onDisconnect"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/cast_intro_overlay_background_color" />
+
+    </RadioGroup>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BLUETOOTH"
+        android:layout_below="@id/isConnect"
+        android:padding="8dp"
+        android:id="@+id/bluetooth"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"/>
+
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/content_isbluetoothon"
+        android:layout_below="@id/isConnect"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/bluetooth"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MEDIA SOUND"
+        android:layout_below="@id/bluetooth"
+        android:padding="8dp"
+        android:id="@+id/media_sound"
+        android:layout_marginTop="8dp"
+        />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/media_seekbar"
+        android:layout_below="@id/media_sound" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RING VOLUME"
+        android:layout_below="@id/media_seekbar"
+        android:padding="8dp"
+        android:id="@+id/ring_volume"
+        android:layout_marginTop="8dp"
+        />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/ring_seekbar"
+        android:layout_below="@id/ring_volume" />
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WIFI"
+        android:layout_below="@id/ring_seekbar"
+        android:padding="8dp"
+        android:id="@+id/wifiOn"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:id="@+id/content_iswifion"
+        android:layout_below="@id/ring_seekbar"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/wifiOn"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_save"
+        android:layout_below="@id/wifiOn"
+        android:text="SAVE"
+        />
+</RelativeLayout>

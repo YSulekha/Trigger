@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.haryadi.trigger.R;
+import com.haryadi.trigger.TriggerActivity;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.utils.ChangeSettings;
 
@@ -34,6 +36,7 @@ public class ChangeSettingsIntentService extends IntentService {
             Log.v("Inside enabled", "jhh");
             String bluetooth = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON));
             String wifi = c.getString((c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION)));
+            Log.v("WIFI+Bluetooth",wifi+bluetooth);
             if (bluetooth.equals("Turn On")) {
                 ChangeSettings.changeBluetoothSetting(this, true);
             } else if(bluetooth.equals("Turn Off")){
@@ -48,20 +51,23 @@ public class ChangeSettingsIntentService extends IntentService {
             Log.v("Volume", String.valueOf(c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL))));
             ChangeSettings.changeMediaVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
             ChangeSettings.changeRingVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
+            ChangeSettings.writeToSharedPref(this,c.getLong(c.getColumnIndex(TriggerContract.TriggerEntry._ID)));
+            TriggerActivity.notifyWidgets(this);
         }
     }
 
-    public Cursor getData(String name,  boolean isConnect){
+    private Cursor getData(String name,  boolean isConnect){
         //Uri uri = TriggerContract.TriggerEntry.buildUriWithName("WIFI"+"_"+name);
-        Uri uri = TriggerContract.TriggerEntry.buildUriWithName(name);
+        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
         String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                TriggerContract.TriggerEntry.COLUMN_NAME + " = ?" + " AND "+
                 TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
         String[] args;
         if(isConnect) {
-            args = new String[]{"Connect"};
+            args = new String[]{name,getString(R.string.text_connect)};
         }
         else {
-            args = new String[]{"Disconnect"};
+            args = new String[]{name,getString(R.string.text_disconnect)};
         }
         Cursor cursor = getContentResolver().query(uri,null,where,args,null);
         if(cursor.moveToNext()){
@@ -74,6 +80,5 @@ public class ChangeSettingsIntentService extends IntentService {
             return null;
         }
     }
-
 }
 
