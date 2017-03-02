@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +25,23 @@ import com.haryadi.trigger.R;
 import com.haryadi.trigger.adapter.ProfileAdapter;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.touch_helper.TouchhelperCallback;
+import com.haryadi.trigger.utils.ChangeSettings;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ProfileFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
+    @BindView(R.id.recycler_profile)
     RecyclerView mRecyclerView;
     ProfileAdapter mAdapter;
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.profile_empty_view)
+    TextView emptyView;
+    @BindView(R.id.profile_coord)
+    CoordinatorLayout coord;
 
     private static final int LOADER_ID = 0;
 
@@ -47,21 +56,17 @@ public class ProfileFragment extends Fragment implements LoaderManager.LoaderCal
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_profile, container, false);
-        toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_profile);
-        TextView emptyView = (TextView)rootView.findViewById(R.id.profile_empty_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
-        CoordinatorLayout coord = (CoordinatorLayout)rootView.findViewById(R.id.profile_coord);
-        mAdapter = new ProfileAdapter(getActivity(), emptyView,coord,new ProfileAdapter.OnItemClickListener() {
+        ButterKnife.bind(this, rootView);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mAdapter = new ProfileAdapter(getActivity(), emptyView, coord, new ProfileAdapter.OnItemClickListener() {
             @Override
-            public void onClick(Uri uri,String trigger) {
-                if(trigger.equals("LOCATION")){
+            public void onClick(Uri uri, String trigger) {
+                if (trigger.equals(getString(R.string.location))) {
                     FragmentManager fm = getActivity().getSupportFragmentManager();
-                    EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null);
+                    EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri, null);
                     editLocationDialogFragment.show(fm, "Edit");
-                }
-                else {
+                } else {
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit", true, uri);
                     editNameDialogFragment.show(fm, "Edit");
@@ -69,9 +74,9 @@ public class ProfileFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
-        ItemTouchHelper.Callback callback = new TouchhelperCallback(mAdapter,getActivity());
+        ItemTouchHelper.Callback callback = new TouchhelperCallback(mAdapter, getActivity());
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(mRecyclerView);
         return rootView;
@@ -85,17 +90,13 @@ public class ProfileFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v("InsideOnActivityCreted", "hhh");
-        getLoaderManager().initLoader(LOADER_ID, null,this);
+        getLoaderManager().initLoader(LOADER_ID, null, this);
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v("Inside Loader","ddd");
         Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-        //  Cursor cursor = getActivity().getContentResolver().query(uri,null,null,null,null);
-        return new CursorLoader(getActivity(),uri,null,null,null,null);
+        return new CursorLoader(getActivity(), uri, ChangeSettings.TRIGGER_COLUMNS, null, null, null);
     }
 
     @Override

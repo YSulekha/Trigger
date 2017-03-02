@@ -25,13 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+//Service to handle Geofencetransition event
+
 public class GeofenceTrasitionService extends IntentService {
 
     private static final String TAG = GeofenceTrasitionService.class.getSimpleName();
     public static final int GEOFENCE_NOTIFICATION_ID = 0;
     public static final String SHARED_LAST_WIFI = "wifi_name";
     public static final String SHARED_LAST_BLUETOOTH = "bluetooth_name";
-    public static final String SHARED_LAST_TRIGGER= "last_trigger";
+    public static final String SHARED_LAST_TRIGGER = "last_trigger";
 
     public GeofenceTrasitionService() {
         super("GeofenceTrasitionService");
@@ -47,98 +49,88 @@ public class GeofenceTrasitionService extends IntentService {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
 
         // Handling errors
-        if ( geofencingEvent.hasError() ) {
-            String errorMsg = ChangeSettings.getErrorString(geofencingEvent.getErrorCode() );
-            Log.e( TAG, errorMsg );
+        if (geofencingEvent.hasError()) {
+            String errorMsg = ChangeSettings.getErrorString(this,geofencingEvent.getErrorCode());
+            Log.e(TAG, errorMsg);
             return;
         }
 
         // Retrieve GeofenceTrasition
         int geoFenceTransition = geofencingEvent.getGeofenceTransition();
         // Check if the transition type
-        if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ) {
+        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
+                geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             // Get the geofence that were triggered
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             // Create a detail message with Geofences received
-            String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences );
+            String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences);
             // Send notification details as a String
-            sendNotification( geofenceTransitionDetails );
-            checkDatabase(triggeringGeofences,geoFenceTransition);
+            sendNotification(geofenceTransitionDetails);
+            checkDatabase(triggeringGeofences, geoFenceTransition);
         }
     }
 
-    public void checkDatabase(List<Geofence> trigger,int transition){
-        Log.v("CheckDatabase", String.valueOf(trigger.size()));
-        for(Geofence geofence : trigger){
+    public void checkDatabase(List<Geofence> trigger, int transition) {
+        for (Geofence geofence : trigger) {
             String name = geofence.getRequestId();
             String connect = "Connect";
-            Log.v("InsideFor",name);
-            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
-                connect = "Connect";
+            if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                connect = getString(R.string.text_connect);
+            } else {
+                connect = getString(R.string.text_disconnect);
             }
-            else{
-                connect="Disconnect";
-            }
-            Log.v("Inside Service",connect);
             Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
             String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
-                    TriggerContract.TriggerEntry.COLUMN_NAME + " = ?" + " AND "+
+                    TriggerContract.TriggerEntry.COLUMN_NAME + " = ?" + " AND " +
                     TriggerContract.TriggerEntry.COLUMN_CONNECT + " = ?";
-          //  String[] args = new String[]{"LOCATION" + "_" + name,connect};
-            String[] args = new String[]{name,connect};
-            Cursor c = getContentResolver().query(uri,null,where,args,null);
-            Log.v("InsideForCount", String.valueOf(c.getCount()));
-            if(c.moveToNext()){
+            String[] args = new String[]{name, connect};
+            Cursor c = getContentResolver().query(uri, ChangeSettings.TRIGGER_COLUMNS, where, args, null);
+            if (c.moveToNext()) {
                 if (c != null) {
-                    Log.v("Inside enabled", "jhh");
-                    String bluetooth = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON));
-                    String wifi = c.getString((c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_ISWIFION)));
-                    if (bluetooth.equals("Turn On")) {
+                    String bluetooth = c.getString(ChangeSettings.INDEX_ISBLUETOOTHON);
+                    String wifi = c.getString((ChangeSettings.INDEX_ISWIFION));
+                    if (bluetooth.equals(getString(R.string.turn_on))) {
                         ChangeSettings.changeBluetoothSetting(this, true);
-                    } else if(bluetooth.equals("Turn Off")){
+                    } else if (bluetooth.equals(getString(R.string.turn_off))) {
                         ChangeSettings.changeBluetoothSetting(this, false);
                     }
-                    if (wifi.equals("Turn On")) {
+                    if (wifi.equals(getString(R.string.turn_on))) {
                         ChangeSettings.changeWifiSettings(this, true);
-                    } else if(wifi.equals("Turn Off")){
+                    } else if (wifi.equals(getString(R.string.turn_off))) {
                         ChangeSettings.changeWifiSettings(this, false);
                     }
 
-                    Log.v("Volume", String.valueOf(c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL))));
-                    ChangeSettings.changeMediaVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL)));
-                    ChangeSettings.changeRingVolume(this, c.getInt(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_RINGVOL)));
-                    ChangeSettings.writeToSharedPref(this,c.getLong(c.getColumnIndex(TriggerContract.TriggerEntry._ID)));
-                    TriggerActivity.notifyWidgets(this);
-
+                    ChangeSettings.changeMediaVolume(this, c.getInt(ChangeSettings.INDEX_MEDIAVOL));
+                    ChangeSettings.changeRingVolume(this, c.getInt(ChangeSettings.INDEX_RINGVOL));
+                    ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
+                    ChangeSettings.notifyWidgets(this);
                 }
                 c.close();
-                Log.v("HasData","true");
-                Log.v("FasDataC", String.valueOf(c.getCount()));
             }
         }
     }
+
     // Create a detail message with Geofences received
     private String getGeofenceTrasitionDetails(int geoFenceTransition, List<Geofence> triggeringGeofences) {
         // get the ID of each geofence triggered
         ArrayList<String> triggeringGeofencesList = new ArrayList<>();
-        for ( Geofence geofence : triggeringGeofences ) {
-            triggeringGeofencesList.add( geofence.getRequestId() );
+        for (Geofence geofence : triggeringGeofences) {
+            triggeringGeofencesList.add(geofence.getRequestId());
         }
         String status = null;
-        if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER )
+        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER)
             status = "Entering ";
-        else if ( geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT )
+        else if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT)
             status = "Exiting ";
-        return status + TextUtils.join( ", ", triggeringGeofencesList);
+        return status + TextUtils.join(", ", triggeringGeofencesList);
     }
 
     // Send a notification
-    private void sendNotification( String msg ) {
-        Log.i(TAG, "sendNotification: " + msg );
+    private void sendNotification(String msg) {
+        Log.i(TAG, "sendNotification: " + msg);
 
         // Intent to start the main Activity
-        Intent notificationIntent = new Intent(this,TriggerActivity.class);
+        Intent notificationIntent = new Intent(this, TriggerActivity.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(TriggerActivity.class);
@@ -147,7 +139,7 @@ public class GeofenceTrasitionService extends IntentService {
 
         // Creating and sending Notification
         NotificationManager notificatioMng =
-                (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificatioMng.notify(
                 GEOFENCE_NOTIFICATION_ID,
                 createNotification(msg, notificationPendingIntent));

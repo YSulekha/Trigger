@@ -8,19 +8,15 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.haryadi.trigger.R;
+
 
 public class TriggerProvider extends ContentProvider {
     private static final int TASK = 100;
     private static final int TASK_WITH_NAME = 101;
     private static final int TASK_WITH_ID = 102;
-    //private static final int TASK_WITH_NAME_AND_DATE = 102;
     private static final String sIdSelection = TriggerContract.TriggerEntry.TABLE_NAME + "." + TriggerContract.TriggerEntry._ID + " = ?";
     private static final String sTriigerSelection = TriggerContract.TriggerEntry.TABLE_NAME + "." + TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME + " = ?";
-  /*  private static final String sDateAndTaskNameSelection = TriggerContract.TriggerEntry.TABLE_NAME + "." +
-            TriggerContract.TriggerEntry.COLUMN_TASK_DATE + " = ?" +
-            " AND " + TriggerContract.TriggerEntry.TABLE_NAME + "." +
-            TriggerContract.TriggerEntry.COLUMN_TASK_NAME + "= ?";*/
-
 
     public static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -34,9 +30,6 @@ public class TriggerProvider extends ContentProvider {
         urimatcher.addURI(authority, TriggerContract.PATH_TRIGGER, TASK);
         urimatcher.addURI(authority, TriggerContract.PATH_TRIGGER + "/#", TASK_WITH_ID);
         urimatcher.addURI(authority, TriggerContract.PATH_TRIGGER + "/*", TASK_WITH_NAME);
-       // urimatcher.addURI(authority, TriggerContract.PATH_TASK + "/*/#", TASK_WITH_NAME_AND_DATE);
-
-
         return urimatcher;
     }
 
@@ -67,18 +60,8 @@ public class TriggerProvider extends ContentProvider {
                 String[] selectionArgs = new String[]{triggerName};
                 retCursor = db.query(TriggerContract.TriggerEntry.TABLE_NAME, projection, sTriigerSelection, selectionArgs, null, null, sort);
                 break;
-
-
-
-       /*     case TASK_WITH_NAME_AND_DATE:
-                long dateValue = TriggerContract.TriggerEntry.getDateFromUriWithTaskName(uri);
-                String name = TriggerContract.TriggerEntry.getTaskNameFromUri(uri);
-                String[] args = new String[]{Long.toString(dateValue), name};
-                retCursor = db.query(TriggerContract.TriggerEntry.TABLE_NAME, projection, sDateAndTaskNameSelection, args, null, null, sort);
-                break;*/
-
             default:
-                throw new UnsupportedOperationException("Unknown Uri" + uri);
+                throw new UnsupportedOperationException(getContext().getString(R.string.unknown_uri) + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
@@ -94,10 +77,8 @@ public class TriggerProvider extends ContentProvider {
                 return TriggerContract.TriggerEntry.CONTENT_DIR_TYPE;
             case TASK_WITH_ID:
                 return TriggerContract.TriggerEntry.CONTENT_ITEM_TYPE;
-           /* case TASK_WITH_NAME_AND_DATE:
-                return TriggerContract.TriggerEntry.CONTENT_ITEM_TYPE;*/
             default:
-                throw new UnsupportedOperationException("Unknown Uri" + uri);
+                throw new UnsupportedOperationException(getContext().getString(R.string.unknown_uri) + uri);
         }
     }
 
@@ -113,11 +94,11 @@ public class TriggerProvider extends ContentProvider {
                 if (id > 0) {
                     retUri = TriggerContract.TriggerEntry.buildTaskUri(id);
                 } else {
-                    throw new SQLException("Error inserting record");
+                    throw new SQLException(getContext().getString(R.string.error_insert));
                 }
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Uri" + uri);
+                throw new UnsupportedOperationException(getContext().getString(R.string.unknown_uri) + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return retUri;
@@ -133,7 +114,7 @@ public class TriggerProvider extends ContentProvider {
                 retValue = db.delete(TriggerContract.TriggerEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Uri" + uri);
+                throw new UnsupportedOperationException(getContext().getString(R.string.unknown_uri) + uri);
         }
         if (retValue != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
@@ -151,7 +132,7 @@ public class TriggerProvider extends ContentProvider {
                 retValue = db.update(TriggerContract.TriggerEntry.TABLE_NAME, contentValues, whereClause, whereArgs);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Uri" + uri);
+                throw new UnsupportedOperationException(getContext().getString(R.string.unknown_uri) + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return retValue;

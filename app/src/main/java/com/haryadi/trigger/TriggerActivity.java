@@ -1,6 +1,5 @@
 package com.haryadi.trigger;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,9 +19,11 @@ import butterknife.ButterKnife;
 
 public class TriggerActivity extends AppCompatActivity {
 
-    @BindView(R.id.viewPager) ViewPager mPager;
+    public
+    @BindView(R.id.viewPager)
+    ViewPager mPager;
+    public static TriggerActivity mInstance = null;
 
-    public static final String ACTION_DATA_UPDATED = "com.haryadi.trigger.ACTION_DATA_UPDATED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,51 +32,39 @@ public class TriggerActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         getWindow().getDecorView().setFitsSystemWindows(true);
+        mInstance = this;
+
+        //When clicked on Widget, open edit dialog fragment
         Intent intent = getIntent();
         String frag = getIntent().getStringExtra("Trigger");
-        if(frag!=null){
-            if(intent.hasExtra("IdValue") && intent.hasExtra("triggerPoint")) {
+        if (frag != null) {
+            if (intent.hasExtra("IdValue") && intent.hasExtra("triggerPoint")) {
                 openFrag(getIntent());
             }
         }
-      //  Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.slide_right);
-        //getWindow().setEnterTransition(transition);
-
-        //  setSupportActionBar(toolbar);
 
         ScreenSlidePagerAdapter mAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mAdapter);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        //Open Map fragment
         mPager.setCurrentItem(1);
     }
 
-    public void openFrag(Intent intent){
-        long id = intent.getLongExtra("IdValue",-1);
+    public void openFrag(Intent intent) {
+        long id = intent.getLongExtra("IdValue", -1);
         String trigger = intent.getStringExtra("triggerPoint");
         Uri uri = TriggerContract.TriggerEntry.buildTaskUri(id);
-        if(trigger.equals("LOCATION")){
+        if (trigger.equals(getString(R.string.location))) {
             FragmentManager fm = getSupportFragmentManager();
-            EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null);
+            EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri, null);
             editLocationDialogFragment.show(fm, "Edit");
-        }
-        else {
+        } else {
             FragmentManager fm = getSupportFragmentManager();
             EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance("Edit", true, uri);
             editNameDialogFragment.show(fm, "Edit");
         }
     }
-
- /*   @Override
-    public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-        }
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -96,9 +85,5 @@ public class TriggerActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public static void notifyWidgets(Context mContext) {
-        Intent intent = new Intent(ACTION_DATA_UPDATED);
-        mContext.sendBroadcast(intent);
-    }
 }
+

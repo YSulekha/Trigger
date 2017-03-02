@@ -9,11 +9,6 @@
         <item>Turn On</item>
     </string-array>
 
-    <string-array name="location_options">
-        <item>Enter</item>
-        <item>Exit</item>
-    </string-array>
-
     <string name="bluetooth">BLUETOOTH</string>
     <string name="wifi">WIFI</string>
     <string name="location">LOCATION</string>
@@ -36,11 +31,42 @@
     <string name="trigger_loc_hint">Add a location name</string>
 
 
-    <string name="hint_search_text">Where\'d you like to go?</string>
     <string name="settings_connect">onConnect</string>
     <string name="settings_disconnect">onDisconnect</string>
     <string name="settings_enter">onEnter</string>
     <string name="settings_exit">onExit</string>
 
+    <string name="turn_on">Turn On</string>
+    <string name="turn_off">Turn Off</string>
+
+    <string name="geofence_not_available">GeoFence not available</string>
+    <string name="geofence_many_geofences">Too many GeoFences</string>
+    <string name="geofence_many_intents">Too many pending intents</string>
+    <string name="geofence_unknown_errors">Unknown error</string>
+
+    <string name="widget_empty_text">No trigger activated</string>
+    <string name="widget_empty_norecord">No Record found</string>
+
+    <string name="trigger_deleted">Trigger deleted</string>
+    <string name="unknown_uri">Unknown Uri</string>
+    <string name="error_insert">Error inserting record</string>
+
+    <string name="profile_description">Profile image</string>
+    <string name="swipe_description">Swipe page</string>
+
+    <string name="recycler_empty_text">No Trigger Set</string>
+
+    <string name="bluetooth_error">To set the trigger bluetooth should be on.Please enable the bluetooth and try again</string>
+   <string name="wifi_error">To set the trigger wifi should be on.Please enable the wifi and try again</string>
+    <string name="loc_perm_exp">Permission reqd to access current location</string>
+
+    <string name="wifi_alert">Do you want to enable WIFI ?</string>
+    <string name="wifi_alert_title">Wifi Settings</string>
+
+    <string name="alert_pos">Yes</string>
+    <string name="alert_neg">No</string>
+
+    <string name="map_styling_err">Style parsing failed.</string>
+    <string name="map_styling_exc">Can\'t find style. Error: </string>
 
 </resources>

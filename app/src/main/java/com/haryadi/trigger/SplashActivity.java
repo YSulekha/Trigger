@@ -5,10 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
-/**
- * Created by aharyadi on 2/21/17.
- */
-
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -26,7 +22,5 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         },1000);
-
-
     }
 }

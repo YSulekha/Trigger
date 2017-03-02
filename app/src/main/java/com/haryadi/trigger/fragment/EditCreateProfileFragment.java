@@ -1,17 +1,19 @@
 package com.haryadi.trigger.fragment;
 
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -45,8 +47,10 @@ public class EditCreateProfileFragment extends DialogFragment {
     Spinner mIsBluetoothOn;
     @BindView(R.id.content_iswifion)
     Spinner mIsWifiOn;
-    @BindView(R.id.wifiOn) ImageButton mWifiButton;
-    @BindView(R.id.bluetooth) ImageButton mBluetoothButton;
+    @BindView(R.id.wifiOn)
+    ImageButton mWifiButton;
+    @BindView(R.id.bluetooth)
+    ImageButton mBluetoothButton;
     @BindView(R.id.button_save)
     Button saveButton;
     @BindView(R.id.spinner_wifi_name)
@@ -57,7 +61,8 @@ public class EditCreateProfileFragment extends DialogFragment {
     RadioButton radioConnect;
     @BindView(R.id.dialog_radio_disconnect)
     RadioButton radioDisConnect;
-    @BindView(R.id.name)ImageButton imageButton;
+    @BindView(R.id.name)
+    ImageButton imageButton;
     @BindView(R.id.wifi_name_text)
     TextView wifiNameText;
     String triggerPoint;
@@ -69,18 +74,25 @@ public class EditCreateProfileFragment extends DialogFragment {
     Uri mUri;
 
 
-
     public EditCreateProfileFragment() {
 
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+
+        // request a window without the title
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
     }
 
     public static EditCreateProfileFragment newInstance(String triggerPoint, boolean isEdit, Uri uri) {
         EditCreateProfileFragment frag = new EditCreateProfileFragment();
         Bundle args = new Bundle();
-        Log.v("titleAct", triggerPoint);
         args.putString("title", triggerPoint);
         args.putBoolean("isEdit", isEdit);
-        Log.v("isEdit", String.valueOf(isEdit));
         if (uri != null) {
             args.putString("Uri", uri.toString());
         }
@@ -142,17 +154,17 @@ public class EditCreateProfileFragment extends DialogFragment {
 
     @OnClick(R.id.button_save)
     public void onClickSave(View view) {
-        if (mWifiName.getSelectedItem()==null && !isEdit) {
+      /*  if (mWifiName.getSelectedItem()==null && !isEdit) {
             Toast.makeText(getActivity(),"Please turn on the "+triggerPoint+" to enter the name",Toast.LENGTH_LONG).show();
             this.dismiss();
         }
-        else {
-            if (!checkForDuplicates()) {
-                insertRecord();
-                this.dismiss();
+        else {*/
+        if (!checkForDuplicates()) {
+            insertRecord();
+            this.dismiss();
 
-            }
         }
+        // }
     }
 
     private void configureViews() {
@@ -166,14 +178,10 @@ public class EditCreateProfileFragment extends DialogFragment {
         mIsWifiOn.setAdapter(optionsAdapter);
         radioConnect.setChecked(true);
         if (triggerPoint.equals(getString(wifi))) {
-            mIsWifiOn.setSelection(0);
-            mIsWifiOn.setEnabled(false);
             mIsWifiOn.setVisibility(View.GONE);
             mWifiButton.setVisibility(View.GONE);
         }
         if (triggerPoint.equals(getString(R.string.bluetooth))) {
-            mIsBluetoothOn.setSelection(0);
-            mIsBluetoothOn.setEnabled(false);
             mBluetoothButton.setVisibility(View.GONE);
             mIsBluetoothOn.setVisibility(View.GONE);
         }
@@ -182,27 +190,14 @@ public class EditCreateProfileFragment extends DialogFragment {
 
     private void configureValues(Uri uri) {
         Cursor cursor = getActivity().getContentResolver().query(uri, ChangeSettings.TRIGGER_COLUMNS, null, null, null);
-        int pos = 0;
         if (cursor.moveToNext()) {
             String triggerPoint = cursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
             if (triggerPoint.equals(getString(wifi))) {
                 mIsWifiOn.setSelection(0);
                 mIsWifiOn.setEnabled(false);
-              //  names = ChangeSettings.getConfiguredWifi(getActivity());
-                //arrayAdapter.notifyDataSetChanged();
-                //arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, names);
-                //arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-               // mWifiName.setAdapter(arrayAdapter);
-
-                pos = arrayAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_NAME));
             } else if (triggerPoint.equals(getString(R.string.bluetooth))) {
                 mIsBluetoothOn.setSelection(0);
                 mIsBluetoothOn.setEnabled(false);
-              //  names = ChangeSettings.getConfiguredBluetooth(getActivity());
-                //arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, names);
-                //arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                //mWifiName.setAdapter(arrayAdapter);
-                pos = arrayAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_NAME));
             }
             if (cursor.getString(ChangeSettings.INDEX_CONNECT).equals(getString(R.string.text_connect))) {
                 radioConnect.setChecked(true);
@@ -216,8 +211,6 @@ public class EditCreateProfileFragment extends DialogFragment {
             wifiNameText.setVisibility(View.VISIBLE);
             radioConnect.setEnabled(false);
             radioDisConnect.setEnabled(false);
-         //   mWifiName.setSelection(pos);
-           // mWifiName.setEnabled(false);
             wifiNameText.setText(cursor.getString(ChangeSettings.INDEX_NAME));
             mIsBluetoothOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISBLUETOOTHON)));
             mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISWIFION)));
@@ -232,11 +225,10 @@ public class EditCreateProfileFragment extends DialogFragment {
         Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
-        Log.v("Ring volume",String.valueOf(ringVolumeBar.getProgress()));
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
         if (isEdit) {
-            values.put(TriggerContract.TriggerEntry.COLUMN_NAME,wifiNameText.getText().toString());
+            values.put(TriggerContract.TriggerEntry.COLUMN_NAME, wifiNameText.getText().toString());
             updateRecord(values);
         } else {
             String name = mWifiName.getSelectedItem().toString();
@@ -244,7 +236,6 @@ public class EditCreateProfileFragment extends DialogFragment {
             ChangeSettings.addWifiNameToSharedPreference(getActivity());
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
-            Log.v("CreateProfile",name+isConnect);
             values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, isConnect);
             getActivity().getContentResolver().insert(uri, values);
         }
@@ -253,7 +244,6 @@ public class EditCreateProfileFragment extends DialogFragment {
 
     private boolean checkForDuplicates() {
         if (!isEdit) {
-
             String name = mWifiName.getSelectedItem().toString();
             Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
             String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +

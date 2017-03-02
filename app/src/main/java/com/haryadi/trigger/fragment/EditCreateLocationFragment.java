@@ -32,15 +32,24 @@ import butterknife.OnClick;
 
 public class EditCreateLocationFragment extends DialogFragment {
 
-    @BindView(R.id.media_seekbar) SeekBar mediaVolumeBar;
-    @BindView(R.id.ring_seekbar) SeekBar ringVolumeBar;
-    @BindView(R.id.content_isbluetoothon) Spinner mIsBluetoothOn;
-    @BindView(R.id.content_iswifion) Spinner mIsWifiOn;
-    @BindView(R.id.button_save) Button saveButton;
-    @BindView(R.id.location_wifi_name) EditText mLocationName;
-    @BindView(R.id.isConnect) RadioGroup radioGroup;
-    @BindView(R.id.dialog_radio_connect) RadioButton radioConnect;
-    @BindView(R.id.dialog_radio_disconnect) RadioButton radioDisConnect;
+    @BindView(R.id.media_seekbar)
+    SeekBar mediaVolumeBar;
+    @BindView(R.id.ring_seekbar)
+    SeekBar ringVolumeBar;
+    @BindView(R.id.content_isbluetoothon)
+    Spinner mIsBluetoothOn;
+    @BindView(R.id.content_iswifion)
+    Spinner mIsWifiOn;
+    @BindView(R.id.button_save)
+    Button saveButton;
+    @BindView(R.id.location_wifi_name)
+    EditText mLocationName;
+    @BindView(R.id.isConnect)
+    RadioGroup radioGroup;
+    @BindView(R.id.dialog_radio_connect)
+    RadioButton radioConnect;
+    @BindView(R.id.dialog_radio_disconnect)
+    RadioButton radioDisConnect;
     String triggerPoint;
     ArrayAdapter<CharSequence> optionsAdapter;
     ArrayAdapter<CharSequence> locationsOptionsAdapter;
@@ -90,7 +99,6 @@ public class EditCreateLocationFragment extends DialogFragment {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                Log.v("OnClick", "onClick");
                 onRadioButtonClicked(checkedId);
             }
         });
@@ -124,10 +132,9 @@ public class EditCreateLocationFragment extends DialogFragment {
     }
 
     private void configureValues(Uri uri) {
-        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(uri, ChangeSettings.TRIGGER_COLUMNS, null, null, null);
         int pos = 0;
         if (cursor.moveToNext()) {
-            String triggerPoint = cursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
             if (cursor.getString(ChangeSettings.INDEX_CONNECT).equals(getString(R.string.text_connect))) {
                 radioConnect.setChecked(true);
                 radioGroup.setEnabled(false);
@@ -149,22 +156,22 @@ public class EditCreateLocationFragment extends DialogFragment {
     }
 
     private void insertRecord() {
-            ContentValues values = new ContentValues();
-            Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
-            String name = mLocationName.getText().toString();
-            values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
-            values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
-            values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
-            values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
-            values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-            if (isEdit) {
-                updateRecord(values);
-            } else {
-                values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);
-                values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
-                values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, isConnect);
-                getActivity().getContentResolver().insert(uri, values);
-            }
+        ContentValues values = new ContentValues();
+        Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
+        String name = mLocationName.getText().toString();
+        values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
+        values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
+        values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
+        if (isEdit) {
+            updateRecord(values);
+        } else {
+            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);
+            values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
+            values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, isConnect);
+            getActivity().getContentResolver().insert(uri, values);
+        }
     }
 
     private void updateRecord(ContentValues values) {
@@ -190,7 +197,6 @@ public class EditCreateLocationFragment extends DialogFragment {
             } else {
                 return false;
             }
-
         }
         return false;
     }
@@ -208,8 +214,7 @@ public class EditCreateLocationFragment extends DialogFragment {
         if (!checkForDuplicates()) {
             if (mLocationName.getText().toString().trim().equals("")) {
                 mLocationName.setError(getString(R.string.text_required));
-            }
-            else {
+            } else {
                 insertRecord();
                 Bundle args = new Bundle();
                 args.putString("Name", mLocationName.getText().toString());
@@ -219,7 +224,6 @@ public class EditCreateLocationFragment extends DialogFragment {
                 } else {
                     value = getString(R.string.text_exit);
                 }
-                Log.v("ClickSave",mLocationName.getText().toString()+value);
                 args.putString("Value", value);
                 if (mListener != null) {
                     mListener.onListen(args);

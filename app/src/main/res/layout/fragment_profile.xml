@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/profile_coord"
-    tools:context="com.haryadi.trigger.MainActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -23,10 +22,10 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_profile"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/recycler_profile"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <TextView
         android:id="@+id/profile_empty_view"
@@ -39,7 +38,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingStart="16dp"
         android:paddingTop="290dp"
-        android:text="No Trigger Set"
+        android:text="@string/recycler_empty_text"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="22sp" />
 

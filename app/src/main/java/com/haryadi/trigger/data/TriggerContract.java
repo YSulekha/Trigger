@@ -4,9 +4,6 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Created by aharyadi on 12/26/16.
- */
 
 public class TriggerContract {
 
@@ -52,18 +49,12 @@ public class TriggerContract {
 
         //returns uri with appended id
         public static Uri buildTaskUri(long id) {
-          //  return ContentUris.withAppendedId(CONTENT_URI, id);
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
-
         }
 
         public static Uri buildUriWithName(String name) {
             return CONTENT_URI.buildUpon().appendPath(name).build();
         }
-
-  /*      public static Uri buildUriWithDate(long date) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(date)).build();
-        }*/
 
         public static String getTriggerNameFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
@@ -72,17 +63,6 @@ public class TriggerContract {
         public static long getIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(1));
         }
-
-  /*      public static long getDateFromUriWithTaskName(Uri uri) {
-
-            return Long.parseLong(uri.getPathSegments().get(2));
-        }
-
-
-
-        public static long getDateFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
-        }*/
 
     }
 }

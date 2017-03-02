@@ -19,12 +19,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -53,6 +55,8 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.haryadi.trigger.R;
+import com.haryadi.trigger.TriggerActivity;
+import com.haryadi.trigger.ZoomOutPageTransformer;
 import com.haryadi.trigger.service.GeofenceTrasitionService;
 import com.haryadi.trigger.utils.ChangeSettings;
 import com.haryadi.trigger.utils.Constants;
@@ -66,7 +70,7 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class MainFragment_bac extends Fragment implements
+public class MapFragment extends Fragment implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -101,14 +105,14 @@ public class MainFragment_bac extends Fragment implements
     FloatingActionButton locationEnable;
     @BindView(R.id.floatingActionMenu)
     FloatingActionMenu floatingActionMenu;
-    //   @BindView(R.id.toolbar)Toolbar toolbar;
+    @BindView(R.id.toolbarSwipe)
+    ImageButton swipeButton;
     @BindView(R.id.coord)
     CoordinatorLayout layout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setRetainInstance(true);
     }
 
 
@@ -118,14 +122,6 @@ public class MainFragment_bac extends Fragment implements
         View rootview = (ViewGroup) inflater.inflate(
                 R.layout.fragment_loc, container, false);
         ButterKnife.bind(this, rootview);
-        /*  if(savedInstanceState==null) {
-        mMapView.onCreate(null);
-        mMapView.getMapAsync(this);
-        // }
-        // else{
-//            mMapView.onCreate(savedInstanceState.getBundle(SAVE_MAP_STATE));
-        //          mMapView.getMapAsync(this);
-        //}*/
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
@@ -143,6 +139,15 @@ public class MainFragment_bac extends Fragment implements
         wifiEnable.setOnClickListener(getOnClick(floatingActionMenu));
         bluetoothEnable.setOnClickListener(getOnClick(floatingActionMenu));
         locationEnable.setOnClickListener(getOnClick(floatingActionMenu));
+        swipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               ViewPager pager= (ViewPager) TriggerActivity.mInstance.findViewById(R.id.viewPager);
+                pager.setPageTransformer(true, new ZoomOutPageTransformer());
+                pager.setCurrentItem(0,true);
+
+            }
+        });
         return rootview;
 
     }
@@ -163,7 +168,6 @@ public class MainFragment_bac extends Fragment implements
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiManager != null) {
             if (!wifiManager.isWifiEnabled()) {
-                // Intent enableBtIntent = new Intent(WifiManager.AC);
                 showAlertDialog();
             } else {
                 showEditDialog(getString(R.string.wifi));
@@ -215,7 +219,6 @@ public class MainFragment_bac extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v("InsideOnActivityCreted", "hhh");
         if(savedInstanceState==null) {
             mMapView.onCreate(null);
             mMapView.getMapAsync(this);
@@ -233,7 +236,6 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.v("OnSave","jjjj");
         Bundle mapState = new Bundle();
         mMapView.onSaveInstanceState(mapState);
         outState.putParcelable(SAVE_MAP_STATE,mapState);
@@ -267,37 +269,27 @@ public class MainFragment_bac extends Fragment implements
     public void onMapReady(GoogleMap googleMap) {
 
         try {
-            // Customise the styling of the base map using a JSON object defined
-            // in a raw resource file.
+           //Styling the map using json
             boolean success = googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
                             getActivity(), R.raw.map_style));
 
             if (!success) {
-                Log.e("Style", "Style parsing failed.");
+                Log.e("Style", getString(R.string.map_styling_err));
             }
         } catch (Resources.NotFoundException e) {
-            Log.e("Style", "Can't find style. Error: ", e);
+            Log.e("Style", getString(R.string.map_styling_exc), e);
         }
         map = googleMap;
         map.getUiSettings().setMyLocationButtonEnabled(true);
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             map.setMyLocationEnabled(true);
         }
         map.setPadding(5,480,5,5);
         map.animateCamera(CameraUpdateFactory.zoomTo(1.0f));
         map.setOnMapLongClickListener(this);
         if(markers.size()>0){
-            Log.v("ActivityCreate", String.valueOf(markers.size()));
             for(int i=0;i<markers.size();i++){
-                Log.v("hhh", String.valueOf(markers.size()));
                 MarkerOptions latLng = markers.get(i);
                 BitmapDescriptor defaultMarker =
                         BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
@@ -329,26 +321,22 @@ public class MainFragment_bac extends Fragment implements
                 getActivity());
 
         // set title
-        alertDialogBuilder.setTitle("Wifi Settings");
+        alertDialogBuilder.setTitle(getString(R.string.wifi_alert_title));
 
         // set dialog message
         alertDialogBuilder
-                .setMessage("Do you want to enable WIFI ?")
+                .setMessage(getString(R.string.wifi_alert))
                 .setCancelable(false)
-                .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.alert_pos),new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        //enable wifi
                         WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
                         wifiManager.setWifiEnabled(true);
                         showEditDialog(getString(R.string.wifi));
                     }
                 })
-                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.alert_neg),new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        //disable wifi
-                        Log.v("Result","canceled");
-                        Toast.makeText(getActivity(),"To set the trigger wifi should be on.Please " +
-                                "enable the wifi and try again",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),getString(R.string.wifi_error),Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -362,7 +350,7 @@ public class MainFragment_bac extends Fragment implements
     public void requestPermission(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            Snackbar.make(layout, "Permission reqd to access current location",
+            Snackbar.make(layout, getString(R.string.loc_perm_exp),
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction("OK", new View.OnClickListener() {
                         @Override
@@ -383,7 +371,6 @@ public class MainFragment_bac extends Fragment implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        Log.v("InsideReq",String.valueOf(requestCode));
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -391,7 +378,6 @@ public class MainFragment_bac extends Fragment implements
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                      //  Log.v("Connected_else", mLastLocation.getLatitude() + mLastLocation.getProvider());
                         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                         if (mLastLocation != null) {
                             LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
@@ -424,9 +410,7 @@ public class MainFragment_bac extends Fragment implements
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        Toast.makeText(getActivity(), "On Click", Toast.LENGTH_LONG).show();
         searchPlace = latLng;
-        //showAlertDialog(latLng);
         showLocationFragment();
     }
 
@@ -462,8 +446,7 @@ public class MainFragment_bac extends Fragment implements
 
     public PendingIntent getPendingIntent() {
         Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return pendingIntent;
+        return  PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public GeofencingRequest createGeofenceReq(String name,String transition) {
@@ -492,7 +475,7 @@ public class MainFragment_bac extends Fragment implements
         if (status.isSuccess()) {
             Toast.makeText(getActivity(), "Geofence Added", Toast.LENGTH_LONG).show();
         } else {
-            String error = ChangeSettings.getErrorString(status.getStatusCode());
+            String error = ChangeSettings.getErrorString(getActivity(),status.getStatusCode());
             Log.v("Error", error);
 
         }
@@ -523,7 +506,7 @@ public class MainFragment_bac extends Fragment implements
                 editNameDialogFragment.show(fm, "LOCATION");
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(getActivity(), data);
-                Log.v("SearchAct", status.getStatusMessage());
+                Log.e("SearchAct", status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }
@@ -533,8 +516,7 @@ public class MainFragment_bac extends Fragment implements
                 showEditDialog(getString(R.string.bluetooth));
             }
             if(resultCode == RESULT_CANCELED){
-                Toast.makeText(getActivity(),"To set the trigger bluetooth should be on.Please " +
-                        "enable the bluetooth and try again",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),getString(R.string.bluetooth_error),Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -552,7 +534,6 @@ public class MainFragment_bac extends Fragment implements
         markers.add(markerOptions);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(searchPlace.latitude,searchPlace.longitude), 12));
-        Log.v("OnListen", String.valueOf(searchPlace.latitude));
         Constants.BAY_AREA_LANDMARKS.put(args.getString("Name"), searchPlace);
         addToGeoFence(args.getString("Name"),args.getString("Value"));
         drawGeofence(marker);

@@ -20,7 +20,6 @@ import com.haryadi.trigger.touch_helper.ItemTouchHelperAdapter;
 import com.haryadi.trigger.utils.ChangeSettings;
 
 /**
- * Created by aharyadi on 1/25/17.
  * AIzaSyAWot9ZEWXoCj8LtO7CTf7HJeGUIUpfDAA
  */
 
@@ -56,8 +55,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         mContext.getContentResolver().delete(TriggerContract.TriggerEntry.CONTENT_URI, where, args);
         notifyItemRemoved(position);
 
-        Toast.makeText(mContext,"Trigger deleted",Toast.LENGTH_LONG).show();
-        Snackbar.make(coordinatorLayout, "Trigger deleted", Snackbar.LENGTH_LONG)
+        Toast.makeText(mContext, mContext.getString(R.string.trigger_deleted), Toast.LENGTH_LONG).show();
+        Snackbar.make(coordinatorLayout, mContext.getString(R.string.trigger_deleted), Snackbar.LENGTH_LONG)
                 .setAction("UNDO", undoListener)
                 .show();
 
@@ -69,16 +68,17 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     public interface OnItemClickListener {
-        void onClick(Uri uri,String trigger);
+        void onClick(Uri uri, String trigger);
     }
 
 
-    public ProfileAdapter(Context c, TextView textView,CoordinatorLayout layout,OnItemClickListener listener){
+    public ProfileAdapter(Context c, TextView textView, CoordinatorLayout layout, OnItemClickListener listener) {
         mContext = c;
         mListener = listener;
         coordinatorLayout = layout;
         emptyView = textView;
     }
+
     @Override
     public ProfileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View item = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_item, parent, false);
@@ -88,18 +88,16 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        String name = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME));
-        String triggerPoint = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
-          holder.profileConnect.setText(mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_CONNECT)));
-        if(triggerPoint.equals("WIFI")){
+        String name = mCursor.getString(ChangeSettings.INDEX_TRIGGER_NAME);
+        String triggerPoint = mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
+        holder.profileConnect.setText(mCursor.getString(ChangeSettings.INDEX_CONNECT));
+        if (triggerPoint.equals(mContext.getString(R.string.wifi))) {
             holder.profileName.setText(name.substring(1, name.length() - 1));
             holder.profileImage.setImageResource(R.drawable.wifi_green);
-        }
-        else if(triggerPoint.equals("BLUETOOTH")){
+        } else if (triggerPoint.equals(mContext.getString(R.string.bluetooth))) {
             holder.profileImage.setImageResource(R.drawable.bluetooth_green);
             holder.profileName.setText(name);
-        }
-        else{
+        } else {
             holder.profileImage.setImageResource(R.drawable.location_green);
             holder.profileName.setText(name);
         }
@@ -107,19 +105,19 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     @Override
     public int getItemCount() {
-        if(mCursor!=null){
+        if (mCursor != null) {
             return mCursor.getCount();
         }
         return 0;
     }
 
-    public void swapCursor(Cursor newCursor){
+    public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
         emptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
-    class ProfileViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ProfileViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView profileName;
         TextView profileConnect;
@@ -127,8 +125,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
         public ProfileViewHolder(View itemView) {
             super(itemView);
-            profileName = (TextView)itemView.findViewById(R.id.item_triggerName);
-            profileConnect = (TextView)itemView.findViewById(R.id.item_connect);
+            profileName = (TextView) itemView.findViewById(R.id.item_triggerName);
+            profileConnect = (TextView) itemView.findViewById(R.id.item_connect);
             profileImage = (ImageView) itemView.findViewById(R.id.profile_image);
             itemView.setOnClickListener(this);
             undoListener = new View.OnClickListener() {
@@ -147,9 +145,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         public void onClick(View v) {
             int pos = getAdapterPosition();
             mCursor.moveToPosition(pos);
-            String triggerPoint = mCursor.getString(mCursor.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT));
-            Uri uri = TriggerContract.TriggerEntry.buildTaskUri(mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID)));
-            mListener.onClick(uri,triggerPoint);
+            String triggerPoint = mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
+            Uri uri = TriggerContract.TriggerEntry.buildTaskUri(mCursor.getLong(ChangeSettings.INDEX_TRIGGER_ID));
+            mListener.onClick(uri, triggerPoint);
         }
     }
 }

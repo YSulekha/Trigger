@@ -20,16 +20,16 @@
             android:id="@+id/widget_profile_image"
             android:src="@drawable/ic_add_location_black_24dp"
             android:layout_centerVertical="true"
+            android:contentDescription="@string/profile_description"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/widget_triggerName"
-            android:layout_toRightOf="@id/widget_profile_image"
-            android:layout_marginLeft="16dp"
+            android:layout_toEndOf="@id/widget_profile_image"
+            android:layout_marginStart="16dp"
             android:layout_alignParentTop="true"
-            android:text="FFF"
             android:textColor="@color/colorPrimaryDark"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textStyle="bold"
@@ -39,10 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id = "@+id/widget_connect"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:layout_below="@id/widget_triggerName"
-            android:layout_toRightOf="@id/widget_profile_image"
+            android:layout_toEndOf="@id/widget_profile_image"
             android:textColor="@color/colorPrimaryDark" />
 
     </RelativeLayout>
@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/widget_empty_text"
-        android:text="No trigger set"
+        android:text="@string/recycler_empty_text"
         android:padding="8dp"
         android:gravity="center"/>
 

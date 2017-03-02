@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.haryadi.trigger.MainActivity">
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -24,18 +23,17 @@
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".MainActivity"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        class="com.google.android.gms.maps.SupportMapFragment"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <FrameLayout
+        android:id="@+id/frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom|end"
-        android:id="@+id/frame_layout"
         android:background="@color/white_overlay">
 
         <com.github.clans.fab.FloatingActionMenu
@@ -44,55 +42,52 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="80dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginEnd="80dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             fab:menu_animationDelayPerItem="0"
-            fab:menu_shadowColor="#444"
             fab:menu_colorNormal="#FFB805"
             fab:menu_colorPressed="#F2AB00"
-            fab:menu_colorRipple="#D99200">
+            fab:menu_colorRipple="#D99200"
+            fab:menu_shadowColor="#444">
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/fab12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_bluetooth_black_24dp"
-                fab:fab_label="Menu item 1"
-               />
+                fab:fab_label="Menu item 1" />
 
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/menu_yellow2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="80dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            fab:menu_animationDelayPerItem="0"
-            fab:menu_shadowColor="#444"
-            fab:menu_colorNormal="#FFB805"
-            fab:menu_colorPressed="#F2AB00"
-            fab:menu_colorRipple="#D99200">
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab22"
+            <com.github.clans.fab.FloatingActionMenu
+                android:id="@+id/menu_yellow2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_wifi_black_24dp"
-                fab:fab_label="Menu item 2"
-               />
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="80dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                fab:menu_animationDelayPerItem="0"
+                fab:menu_colorNormal="#FFB805"
+                fab:menu_colorPressed="#F2AB00"
+                fab:menu_colorRipple="#D99200"
+                fab:menu_shadowColor="#444">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab32"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_location_on_black_24dp"
-                fab:fab_label="Menu"
-                />
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/fab22"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_wifi_black_24dp"
+                    fab:fab_label="Menu item 2" />
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/fab32"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_location_on_black_24dp"
+                    fab:fab_label="Menu" />
             </com.github.clans.fab.FloatingActionMenu>
 
         </com.github.clans.fab.FloatingActionMenu>
