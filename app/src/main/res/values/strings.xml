@@ -74,5 +74,6 @@
     <string name="fab_menu_label">SET TRIGGER HERE</string>
 
     <string name="notification_text">Trigger Enabled</string>
+    <string name="geofence_msg">Geofence Added</string>
 
 </resources>

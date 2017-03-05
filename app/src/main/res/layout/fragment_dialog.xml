@@ -70,7 +70,7 @@
             android:buttonTint="@color/colorAccent"
             android:fontFamily="sans-serif-medium"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/cast_intro_overlay_background_color" />
+             />
 
         <RadioButton
             android:id="@+id/dialog_radio_disconnect"
@@ -80,7 +80,7 @@
             android:fontFamily="sans-serif-medium"
             android:buttonTint="@color/colorAccent"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/cast_intro_overlay_background_color" />
+             />
     </RadioGroup>
 
 

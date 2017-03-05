@@ -474,7 +474,7 @@ public class MapFragment extends Fragment implements
     //Method called when geoFence is added
     public void onResult(Status status) {
         if (status.isSuccess()) {
-            Toast.makeText(getActivity(), "Geofence Added", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), getString(R.string.geofence_msg), Toast.LENGTH_LONG).show();
         } else {
             String error = ChangeSettings.getErrorString(getActivity(),status.getStatusCode());
             Log.v("Error", error);

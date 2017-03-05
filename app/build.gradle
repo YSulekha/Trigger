@@ -4,7 +4,7 @@ apply plugin: 'android-apt'
 
 // Create a variable called keystorePropertiesFile, and initialize it to your
 // keystore.properties file, in the rootProject folder.
-def keystorePropertiesFile = rootProject.file("/Users/aharyadi/keystore.properties")
+def keystorePropertiesFile = rootProject.file("keystore.properties")
 
 // Initialize a new Properties() object called keystoreProperties.
 def keystoreProperties = new Properties()
@@ -25,11 +25,11 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
-                GEO_API_KEY     : GRIPSACK_GEO_API_KEY
+                GEO_API_KEY     : TRIGGER_GEO_API_KEY
         ]
     }
     signingConfigs {
-        config {
+        triggerconfig {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
             storeFile file(keystoreProperties['storeFile'])
@@ -40,7 +40,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.triggerconfig
         }
     }
 
@@ -54,7 +54,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.google.android.gms:play-services:10.0.1'
+    compile 'com.google.android.gms:play-services-maps:10.0.0'
+    compile 'com.google.android.gms:play-services-location:10.0.0'
+    compile 'com.google.android.gms:play-services-places:10.0.0'
     //Library to display FAB
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.jakewharton:butterknife:8.4.0'

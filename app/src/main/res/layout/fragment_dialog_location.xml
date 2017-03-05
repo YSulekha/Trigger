@@ -55,14 +55,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_enter"
-            android:textColor="@color/cast_intro_overlay_background_color" />
+             />
 
         <RadioButton
             android:id="@+id/dialog_radio_disconnect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_exit"
-            android:textColor="@color/cast_intro_overlay_background_color" />
+            />
 
     </RadioGroup>
 
