@@ -10,6 +10,7 @@
         android:id="@+id/profile_image"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_marginStart="16dp"
         android:layout_centerVertical="true"
         android:contentDescription="@string/profile_description"
         android:src="@drawable/ic_add_location_black_24dp" />

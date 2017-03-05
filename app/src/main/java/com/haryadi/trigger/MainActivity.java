@@ -234,8 +234,6 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
 
     // Create a Geofence
     private Geofence createGeofence(LatLng latLng, float radius ) {
-        Log.d("jjj", "createGeofence");
-        Log.v("latitude", String.valueOf(latLng.latitude+latLng.longitude));
         return new Geofence.Builder()
                 .setRequestId(GEOFENCE_REQ_ID)
                 .setCircularRegion( latLng.latitude, latLng.longitude, GEOFENCE_RADIUS)
@@ -247,7 +245,6 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
 
     // Create a Geofence Request
     private GeofencingRequest createGeofenceRequest(Geofence geofence ) {
-        Log.d("jj", "createGeofenceRequest");
         return new GeofencingRequest.Builder()
                 .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
                 .addGeofence( geofence )
@@ -256,7 +253,6 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
     private PendingIntent geoFencePendingIntent;
     private final int GEOFENCE_REQ_CODE = 0;
     private PendingIntent createGeofencePendingIntent() {
-        Log.d("nnnn", "createGeofencePendingIntent");
         if ( geoFencePendingIntent != null )
             return geoFencePendingIntent;
 
@@ -267,7 +263,6 @@ GoogleMap.OnMarkerClickListener, ResultCallback<Status>
 
     // Add the created GeofenceRequest to the device's monitoring list
     private void addGeofence(GeofencingRequest request) {
-        Log.d("hhh", "addGeofence");
 
      //   checkPermission();
        // Log.v("checkPermissionValue", String.valueOf(checkPermission()));

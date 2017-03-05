@@ -9,18 +9,17 @@
         <item>Turn On</item>
     </string-array>
 
-    <string name="bluetooth">BLUETOOTH</string>
-    <string name="wifi">WIFI</string>
-    <string name="location">LOCATION</string>
-    <string name="location_msg">Add a location:By adding Pin or Search for a location</string>
-    <string name="text_connect">Connect</string>
-    <string name="text_disconnect">Disconnect</string>
-    <string name="text_duplicates">There is already a profile for this trigger</string>
-    <string name="text_required">Name is a Required field</string>
-    <string name="text_enter">Enter</string>
-    <string name="text_exit">Exit</string>
+    <string name="bluetooth" translatable="false">BLUETOOTH</string>
+    <string name="wifi" translatable="false">WIFI</string>
+    <string name="location" translatable="false">LOCATION</string>
+    <string name="text_connect" translatable="false">Connect</string>
+    <string name="text_disconnect" translatable="false">Disconnect</string>
+    <string name="text_enter" translatable="false">Enter</string>
+    <string name="text_exit" translatable="false">Exit</string>
 
-
+    <string name="location_msg">Add a location by adding a pin or search for a location</string>
+    <string name="text_duplicates">There is already a profile present for this trigger</string>
+    <string name="text_required">Name is a required field</string>
     <string name="trigger_name">Trigger Name</string>
     <string name="trigger_settings">Trigger Settings</string>
     <string name="trigger_bluetooth">Bluetooth Settings</string>
@@ -28,7 +27,7 @@
     <string name="trigger_media_volume">Media Volume Settings</string>
     <string name="trigger_ring_volume">Ring Volume Settings</string>
     <string name="trigger_save">SAVE</string>
-    <string name="trigger_loc_hint">Add a location name</string>
+    <string name="trigger_loc_hint">Search for a location</string>
 
 
     <string name="settings_connect">onConnect</string>
@@ -56,9 +55,9 @@
 
     <string name="recycler_empty_text">No Trigger Set</string>
 
-    <string name="bluetooth_error">To set the trigger bluetooth should be on.Please enable the bluetooth and try again</string>
-   <string name="wifi_error">To set the trigger wifi should be on.Please enable the wifi and try again</string>
-    <string name="loc_perm_exp">Permission reqd to access current location</string>
+    <string name="bluetooth_error">To set the BLUETOOTH trigger, bluetooth should be enabled. Please enable the bluetooth and try again</string>
+    <string name="wifi_error">To create a WIFI trigger, wifi should be enabled. Please enable the wifi and try again</string>
+    <string name="loc_perm_exp">Permission required to access current location</string>
 
     <string name="wifi_alert">Do you want to enable WIFI ?</string>
     <string name="wifi_alert_title">Wifi Settings</string>
@@ -68,5 +67,12 @@
 
     <string name="map_styling_err">Style parsing failed.</string>
     <string name="map_styling_exc">Can\'t find style. Error: </string>
+    
+    <string name="fab_wifi">WIFI</string>
+    <string name="fab_bluetooth">BLUETOOTH</string>
+    <string name="fab_loc">LOCATION</string>
+    <string name="fab_menu_label">SET TRIGGER HERE</string>
+
+    <string name="notification_text">Trigger Enabled</string>
 
 </resources>

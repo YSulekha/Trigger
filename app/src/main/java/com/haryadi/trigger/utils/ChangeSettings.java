@@ -93,7 +93,8 @@ public class ChangeSettings {
     //Method to set Ring volume
     public static void changeRingVolume(Context context, int progress) {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        //audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, progress, 0);
     }
 
     //Method to get saved Wifi network name

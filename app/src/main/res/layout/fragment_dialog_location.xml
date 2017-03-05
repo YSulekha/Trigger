@@ -26,7 +26,8 @@
         android:layout_toEndOf="@id/name"
         android:hint="@string/trigger_loc_hint"
         android:padding="8dp"
-        android:paddingStart="8dp" />
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"/>
 
     <ImageButton
         android:id="@+id/settings"
@@ -46,7 +47,8 @@
         android:layout_gravity="center"
         android:layout_toEndOf="@id/settings"
         android:orientation="horizontal"
-        android:paddingStart="8dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <RadioButton
             android:id="@+id/dialog_radio_connect"

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationServices;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
+import com.haryadi.trigger.fragment.MapFragment;
 import com.haryadi.trigger.touch_helper.ItemTouchHelperAdapter;
 import com.haryadi.trigger.utils.ChangeSettings;
+
+import java.util.ArrayList;
 
 /**
  * AIzaSyAWot9ZEWXoCj8LtO7CTf7HJeGUIUpfDAA
@@ -39,6 +44,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
         mCursor.moveToPosition(position);
         deleteValues = new ContentValues();
+        String name = mCursor.getString(ChangeSettings.INDEX_NAME);
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, mCursor.getString(ChangeSettings.INDEX_TRIGGER_NAME));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_NAME, mCursor.getString(ChangeSettings.INDEX_NAME));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, mCursor.getString(ChangeSettings.INDEX_CONNECT));
@@ -54,6 +60,11 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         String[] args = new String[]{Long.toString(id)};
         mContext.getContentResolver().delete(TriggerContract.TriggerEntry.CONTENT_URI, where, args);
         notifyItemRemoved(position);
+        ArrayList<String> rem = new ArrayList<>();
+        rem.add(name);
+        LocationServices.GeofencingApi.removeGeofences(MapFragment.mGoogleApiClient,rem);
+        Log.v("GoogleApiClient", String.valueOf(MapFragment.mGoogleApiClient.isConnected()));
+
 
         Toast.makeText(mContext, mContext.getString(R.string.trigger_deleted), Toast.LENGTH_LONG).show();
         Snackbar.make(coordinatorLayout, mContext.getString(R.string.trigger_deleted), Snackbar.LENGTH_LONG)
@@ -88,7 +99,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        String name = mCursor.getString(ChangeSettings.INDEX_TRIGGER_NAME);
+        String name = mCursor.getString(ChangeSettings.INDEX_NAME);
+        Log.v("BindViewHolder",name);
         String triggerPoint = mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
         holder.profileConnect.setText(mCursor.getString(ChangeSettings.INDEX_CONNECT));
         if (triggerPoint.equals(mContext.getString(R.string.wifi))) {

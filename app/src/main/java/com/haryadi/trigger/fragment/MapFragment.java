@@ -81,7 +81,7 @@ public class MapFragment extends Fragment implements
     @BindView(R.id.mapView)
     MapView mMapView;
     private GoogleMap map;
-    GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     ArrayList<Geofence> mGeofenceList = new ArrayList<>();
     LatLng searchPlace;
@@ -214,6 +214,7 @@ public class MapFragment extends Fragment implements
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        Log.v("MapFragment","OnResume");
     }
 
     @Override

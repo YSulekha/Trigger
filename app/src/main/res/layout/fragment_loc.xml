@@ -31,18 +31,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="48dp"
+                android:layout_marginStart="4dp"
                 android:contentDescription="@string/swipe_description"
                 android:gravity="center"
-                android:src="@drawable/ic_sort_grey_600_24dp" />
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_sort_color_24dp" />
 
             <EditText
                 android:id="@+id/toolbarText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="36dp"
                 android:layout_toEndOf="@id/toolbarSwipe"
                 android:background="@drawable/edit_text_border"
@@ -64,12 +65,12 @@
         fab:menu_animationDelayPerItem="50"
         fab:menu_backgroundColor="@android:color/transparent"
         fab:menu_buttonSpacing="0dp"
-        fab:menu_colorNormal="@color/colorAccent"
-        fab:menu_colorPressed="@color/colorAccent"
+        fab:menu_colorNormal="@color/fab_color"
+        fab:menu_colorPressed="@color/colorPrimaryDark"
         fab:menu_colorRipple="#99FFFFFF"
         fab:menu_fab_size="normal"
         fab:menu_icon="@drawable/fab_add"
-        fab:menu_labels_colorNormal="#333333"
+        fab:menu_labels_colorNormal="@color/colorPrimary"
         fab:menu_labels_colorPressed="#444444"
         fab:menu_labels_colorRipple="#66FFFFFF"
         fab:menu_labels_cornerRadius="3dp"
@@ -93,6 +94,7 @@
         fab:menu_shadowRadius="4dp"
         fab:menu_shadowXOffset="1dp"
         fab:menu_shadowYOffset="3dp"
+        fab:menu_fab_label="@string/fab_menu_label"
         fab:menu_showShadow="true">
 
         <com.github.clans.fab.FloatingActionButton
@@ -100,7 +102,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_wifi_black_24dp"
-            fab:fab_label="Wifi Enable"
+            fab:fab_colorNormal="@color/colorAccent"
+            app:fab_colorPressed="@color/green"
+            fab:fab_label="@string/fab_wifi"
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -108,15 +112,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bluetooth_black_24dp"
-            fab:fab_label="Bluetooth Enable"
+            fab:fab_colorNormal="@color/colorAccent"
+            app:fab_colorPressed="@color/green"
+            fab:fab_label="@string/fab_bluetooth"
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/location_enable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/colorAccent"
+            app:fab_colorPressed="@color/green"
             android:src="@drawable/ic_location_on_black_24dp"
-            fab:fab_label="Enter Location"
+            fab:fab_label="@string/fab_loc"
             fab:fab_size="mini" />
 
     </com.github.clans.fab.FloatingActionMenu>

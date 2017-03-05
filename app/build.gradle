@@ -1,6 +1,18 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
+
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("/Users/aharyadi/keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -12,17 +24,30 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [
+                GEO_API_KEY     : GRIPSACK_GEO_API_KEY
+        ]
+    }
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
+
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -32,12 +57,9 @@ dependencies {
     compile 'com.google.android.gms:play-services:10.0.1'
     //Library to display FAB
     compile 'com.github.clans:fab:1.6.4'
-
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
-
     compile 'de.hdodenhof:circleimageview:2.1.0'
-
     //Displaying Gif
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
 }

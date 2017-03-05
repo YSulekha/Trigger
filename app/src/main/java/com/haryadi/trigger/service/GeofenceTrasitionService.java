@@ -64,13 +64,14 @@ public class GeofenceTrasitionService extends IntentService {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             // Create a detail message with Geofences received
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences);
-            // Send notification details as a String
-            sendNotification(geofenceTransitionDetails);
-            checkDatabase(triggeringGeofences, geoFenceTransition);
+            if(checkDatabase(triggeringGeofences, geoFenceTransition)) {
+                // Send notification details as a String
+                sendNotification(geofenceTransitionDetails);
+            }
         }
     }
 
-    public void checkDatabase(List<Geofence> trigger, int transition) {
+    public boolean checkDatabase(List<Geofence> trigger, int transition) {
         for (Geofence geofence : trigger) {
             String name = geofence.getRequestId();
             String connect = "Connect";
@@ -104,10 +105,13 @@ public class GeofenceTrasitionService extends IntentService {
                     ChangeSettings.changeRingVolume(this, c.getInt(ChangeSettings.INDEX_RINGVOL));
                     ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
                     ChangeSettings.notifyWidgets(this);
+                    return true;
                 }
                 c.close();
             }
+
         }
+        return false;
     }
 
     // Create a detail message with Geofences received
@@ -128,7 +132,6 @@ public class GeofenceTrasitionService extends IntentService {
     // Send a notification
     private void sendNotification(String msg) {
         Log.i(TAG, "sendNotification: " + msg);
-
         // Intent to start the main Activity
         Intent notificationIntent = new Intent(this, TriggerActivity.class);
 
@@ -152,7 +155,7 @@ public class GeofenceTrasitionService extends IntentService {
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
                 .setColor(Color.RED)
                 .setContentTitle(msg)
-                .setContentText("Geofence Notification!")
+                .setContentText(getString(R.string.notification_text))
                 .setContentIntent(notificationPendingIntent)
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND)
                 .setAutoCancel(true);
