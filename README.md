@@ -14,7 +14,7 @@ The following functionality is completed:
 * User can select the wifi or bluetooth name from the saved name in create screen.
 * User can disable or delete a trigger.
 
-Note: Please initialize "GEO_API_KEY" parameter in gradle.properties with your Google API key which has Google Maps API enabled.
+Note: Please initialize "TRIGGER_GEO_API_KEY" parameter in gradle.properties with your Google API key which has Google Maps API enabled.
 
 ## License
 
