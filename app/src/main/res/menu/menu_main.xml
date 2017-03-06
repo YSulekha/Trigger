@@ -10,6 +10,6 @@
     <item
         android:id="@+id/action_geofence"
         android:orderInCategory="100"
-        android:title="GeoFence"
+        android:title="@string/action_geofence"
         app:showAsAction="never" />
 </menu>
