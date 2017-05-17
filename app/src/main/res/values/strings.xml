@@ -12,8 +12,8 @@
     <string name="bluetooth" translatable="false">BLUETOOTH</string>
     <string name="wifi" translatable="false">WIFI</string>
     <string name="location" translatable="false">LOCATION</string>
-    <string name="text_connect" translatable="false">Connect</string>
-    <string name="text_disconnect" translatable="false">Disconnect</string>
+    <string name="text_connect" translatable="false">On Connect</string>
+    <string name="text_disconnect" translatable="false">On Disconnect</string>
     <string name="text_enter" translatable="false">Enter</string>
     <string name="text_exit" translatable="false">Exit</string>
 
@@ -27,13 +27,13 @@
     <string name="trigger_media_volume">Media Volume Settings</string>
     <string name="trigger_ring_volume">Ring Volume Settings</string>
     <string name="trigger_save">SAVE</string>
-    <string name="trigger_loc_hint">Search for a location</string>
+    <string name="trigger_loc_hint">Add a nick name</string>
+    <string name="trigger_search_hint">Search to add a location based trigger</string>
 
-
-    <string name="settings_connect">onConnect</string>
-    <string name="settings_disconnect">onDisconnect</string>
-    <string name="settings_enter">onEnter</string>
-    <string name="settings_exit">onExit</string>
+    <string name="settings_connect">On Connect</string>
+    <string name="settings_disconnect">On Disconnect</string>
+    <string name="settings_enter">On Enter</string>
+    <string name="settings_exit">On Exit</string>
 
     <string name="turn_on">Turn On</string>
     <string name="turn_off">Turn Off</string>

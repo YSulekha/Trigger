@@ -44,6 +44,8 @@ public class TriggerContract {
         public static final String COLUMN_MEDIAVOL = "media";
         //Column for setting Ring volume
         public static final String COLUMN_RINGVOL = "ring";
+        //Column for notification volume
+        public static final String COLUMN_NOTIFVOL = "notif";
         //brightness setting
         public static final String COLUMN_BRIGHTNESS = "brightness";
 

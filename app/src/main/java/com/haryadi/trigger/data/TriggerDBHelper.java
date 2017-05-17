@@ -30,6 +30,7 @@ public class TriggerDBHelper extends SQLiteOpenHelper {
                 TriggerContract.TriggerEntry.COLUMN_BRIGHTNESS + " TEXT," +
                 TriggerContract.TriggerEntry.COLUMN_MEDIAVOL + " INTEGER," +
                 TriggerContract.TriggerEntry.COLUMN_RINGVOL + " INTEGER," +
+                TriggerContract.TriggerEntry.COLUMN_NOTIFVOL + " INTEGER," +
                 TriggerContract.TriggerEntry.COLUMN_ISWIFION + " TEXT );";
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
     }

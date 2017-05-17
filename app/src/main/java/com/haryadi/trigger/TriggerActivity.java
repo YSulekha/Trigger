@@ -51,6 +51,16 @@ public class TriggerActivity extends AppCompatActivity {
         mPager.setCurrentItem(1);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mPager.getCurrentItem() == 1) {
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+        }
+    }
+
     public void openFrag(Intent intent) {
         long id = intent.getLongExtra("IdValue", -1);
         String trigger = intent.getStringExtra("triggerPoint");
@@ -69,7 +79,7 @@ public class TriggerActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    //    getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 

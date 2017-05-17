@@ -11,7 +11,11 @@ import android.media.AudioManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.annotation.RequiresApi;
+import android.telephony.SmsManager;
 
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.haryadi.trigger.R;
@@ -34,7 +38,8 @@ public class ChangeSettings {
             TriggerContract.TriggerEntry.COLUMN_ISWIFION,
             TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON,
             TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,
-            TriggerContract.TriggerEntry.COLUMN_RINGVOL
+            TriggerContract.TriggerEntry.COLUMN_RINGVOL,
+            TriggerContract.TriggerEntry.COLUMN_NOTIFVOL
     };
 
     public static final int INDEX_TRIGGER_ID = 0;
@@ -46,6 +51,7 @@ public class ChangeSettings {
     public static final int INDEX_ISBLUETOOTHON = 6;
     public static final int INDEX_MEDIAVOL = 7;
     public static final int INDEX_RINGVOL = 8;
+    public static final int INDEX_NOTIFVOL = 9;
 
     public static final String ACTION_DATA_UPDATED = "com.haryadi.trigger.ACTION_DATA_UPDATED";
 
@@ -96,6 +102,19 @@ public class ChangeSettings {
         //audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
         audioManager.setStreamVolume(AudioManager.STREAM_RING, progress, 0);
     }
+
+    //Method to set Notification volume
+    public static void changeNotificationVolume(Context context, int progress) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, progress, 0);
+    }
+
+    //Method to change brightness
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static void changeBrightness(Context context, int progress) {
+        Settings.System.putInt(context.getContentResolver(),Settings.System.SCREEN_BRIGHTNESS,progress);
+    }
+
 
     //Method to get saved Wifi network name
     public static ArrayList<String> getConfiguredWifi(Context context) {
@@ -169,4 +188,10 @@ public class ChangeSettings {
         Intent intent = new Intent(ACTION_DATA_UPDATED);
         mContext.sendBroadcast(intent);
     }
+
+    public static void sendMessage(){
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage("+1 6503355397",null,"Testing Trigger",null,null);
+    }
+
 }

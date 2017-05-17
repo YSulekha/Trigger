@@ -44,6 +44,7 @@ public class ChangeSettingsIntentService extends IntentService {
             }
             ChangeSettings.changeMediaVolume(this, c.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ChangeSettings.changeRingVolume(this, c.getInt(ChangeSettings.INDEX_RINGVOL));
+            ChangeSettings.changeNotificationVolume(this, c.getInt(ChangeSettings.INDEX_NOTIFVOL));
             ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
             ChangeSettings.notifyWidgets(this);
             c.close();

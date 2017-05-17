@@ -36,6 +36,8 @@ public class EditCreateLocationFragment extends DialogFragment {
     SeekBar mediaVolumeBar;
     @BindView(R.id.ring_seekbar)
     SeekBar ringVolumeBar;
+    @BindView(R.id.notif_seekbar)
+    SeekBar notifVolumeBar;
     @BindView(R.id.content_isbluetoothon)
     Spinner mIsBluetoothOn;
     @BindView(R.id.content_iswifion)
@@ -53,7 +55,7 @@ public class EditCreateLocationFragment extends DialogFragment {
     String triggerPoint;
     ArrayAdapter<CharSequence> optionsAdapter;
     ArrayAdapter<CharSequence> locationsOptionsAdapter;
-    String isConnect = "Connect";
+    String isConnect;
     boolean isEdit = false;
     Uri mUri;
     static locationListener mListener;
@@ -89,6 +91,7 @@ public class EditCreateLocationFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        isConnect = getString(R.string.text_connect);
         triggerPoint = getArguments().getString("title", "Enter Name");
         isEdit = getArguments().getBoolean("isEdit");
         configureViews();
@@ -151,6 +154,7 @@ public class EditCreateLocationFragment extends DialogFragment {
             mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISWIFION)));
             mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
+            notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
             cursor.close();
         }
     }
@@ -162,6 +166,7 @@ public class EditCreateLocationFragment extends DialogFragment {
         values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL,notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
         if (isEdit) {
@@ -205,8 +210,10 @@ public class EditCreateLocationFragment extends DialogFragment {
         final AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mediaVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+        notifVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION));
         mediaVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
+        notifVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION));
     }
 
     @OnClick(R.id.button_save)

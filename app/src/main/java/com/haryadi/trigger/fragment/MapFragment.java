@@ -84,7 +84,7 @@ public class MapFragment extends Fragment implements
     public static GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     ArrayList<Geofence> mGeofenceList = new ArrayList<>();
-    LatLng searchPlace;
+    static LatLng searchPlace;
 
     boolean submitPressed = false;
 
@@ -175,6 +175,13 @@ public class MapFragment extends Fragment implements
         }
     }
 
+    public void checkIfThereAreSavedWifi(Context context){
+        ArrayList<String> names = ChangeSettings.getConfiguredWifi(getActivity());
+        if(names.size() == 0){
+            Toast.makeText(context,"There are no saved wifi",Toast.LENGTH_LONG).show();
+        }
+    }
+
     public View.OnClickListener getOnClick(final FloatingActionMenu fm) {
         FloatingActionButton b;
         return new View.OnClickListener() {
@@ -182,12 +189,12 @@ public class MapFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.wifi_enable) {
+                    checkIfThereAreSavedWifi(getActivity());
                     fm.close(true);
                     checkIfWifiEnabled(getActivity());
                 } else if (v.getId() == R.id.bluetooth_enable) {
                     fm.close(true);
                     checkIfBluetoothEnabled(getActivity());
-
                 } else if (v.getId() == R.id.location_enable) {
                     Toast t = Toast.makeText(getActivity(), getString(R.string.location_msg), Toast.LENGTH_SHORT);
                     t.show();
@@ -214,7 +221,6 @@ public class MapFragment extends Fragment implements
     public void onResume() {
         super.onResume();
         mMapView.onResume();
-        Log.v("MapFragment","OnResume");
     }
 
     @Override
@@ -330,7 +336,7 @@ public class MapFragment extends Fragment implements
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.alert_pos),new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
-                        WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+                        WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                         wifiManager.setWifiEnabled(true);
                         showEditDialog(getString(R.string.wifi));
                     }
@@ -432,7 +438,7 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    public Geofence createGeofenceObject(String name,String transition){
+    public static Geofence createGeofenceObject(String name,String transition){
         Geofence.Builder builder= new Geofence.Builder().
                 setRequestId(name).
                 setExpirationDuration(Geofence.NEVER_EXPIRE).
@@ -445,12 +451,12 @@ public class MapFragment extends Fragment implements
         return builder.build();
     }
 
-    public PendingIntent getPendingIntent() {
+    public  PendingIntent getPendingIntent() {
         Intent intent = new Intent(getActivity(), GeofenceTrasitionService.class);
         return  PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public GeofencingRequest createGeofenceReq(String name,String transition) {
+    public static GeofencingRequest createGeofenceReq(String name,String transition) {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         //builder.addGeofences(mGeofenceList);
         builder.addGeofence(createGeofenceObject(name,transition));
@@ -462,10 +468,10 @@ public class MapFragment extends Fragment implements
         return builder.build();
     }
 
-    public void addToGeoFence(String name, String transition) {
+    public static void addToGeoFence(String name, String transition, PendingIntent pendingIntent,ResultCallback mContext) {
 
         try {
-            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, createGeofenceReq(name,transition), getPendingIntent()).setResultCallback(this);
+            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, createGeofenceReq(name,transition), pendingIntent).setResultCallback(mContext);
         } catch (SecurityException ex) {
             Log.v("No permission", "dds");
         }
@@ -536,7 +542,8 @@ public class MapFragment extends Fragment implements
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(searchPlace.latitude,searchPlace.longitude), 12));
         Constants.BAY_AREA_LANDMARKS.put(args.getString("Name"), searchPlace);
-        addToGeoFence(args.getString("Name"),args.getString("Value"));
+        PendingIntent pendingIntent = getPendingIntent();
+        addToGeoFence(args.getString("Name"),args.getString("Value"),pendingIntent,this);
         drawGeofence(marker);
     }
     // Draw Geofence circle on GoogleMap

@@ -1,11 +1,15 @@
 package com.haryadi.trigger.fragment;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +48,8 @@ public class EditCreateProfileFragment extends DialogFragment {
     SeekBar mediaVolumeBar;
     @BindView(R.id.ring_seekbar)
     SeekBar ringVolumeBar;
+    @BindView(R.id.notif_seekbar)
+    SeekBar notifVolumeBar;
     @BindView(R.id.content_isbluetoothon)
     Spinner mIsBluetoothOn;
     @BindView(R.id.content_iswifion)
@@ -73,6 +79,8 @@ public class EditCreateProfileFragment extends DialogFragment {
     String isConnect;
     boolean isEdit = false;
     Uri mUri;
+
+    public static final int REQUEST_SMS = 100;
 
 
     public EditCreateProfileFragment() {
@@ -117,6 +125,7 @@ public class EditCreateProfileFragment extends DialogFragment {
         names = new ArrayList<>();
         if (triggerPoint.equals(getString(wifi))) {
             names = ChangeSettings.getConfiguredWifi(getActivity());
+            Toast.makeText(getActivity(),"Size"+names.size(),Toast.LENGTH_LONG).show();
             imageButton.setImageResource(R.drawable.ic_wifi_brown);
         }
         if (triggerPoint.equals(getString(R.string.bluetooth))) {
@@ -165,7 +174,42 @@ public class EditCreateProfileFragment extends DialogFragment {
             this.dismiss();
 
         }
+      //  ChangeSettings.sendMessage();
+      //  checkpermission();
         // }
+    }
+
+    public void checkpermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            int hasSMSPermission = getActivity().checkSelfPermission(Manifest.permission.SEND_SMS);
+            if (hasSMSPermission != PackageManager.PERMISSION_GRANTED) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+                    showMessageOKCancel("You need to allow access to Send SMS",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        getActivity().requestPermissions(new String[]{Manifest.permission.SEND_SMS},
+                                                REQUEST_SMS);
+                                    }
+                                }
+                            });
+                    return;
+                }
+                getActivity().requestPermissions(new String[]{Manifest.permission.SEND_SMS},
+                        REQUEST_SMS);
+                return;
+            }
+            ChangeSettings.sendMessage();
+        }
+    }
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new android.support.v7.app.AlertDialog.Builder(getActivity())
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     private void configureViews() {
@@ -217,6 +261,7 @@ public class EditCreateProfileFragment extends DialogFragment {
             mIsWifiOn.setSelection(optionsAdapter.getPosition(cursor.getString(ChangeSettings.INDEX_ISWIFION)));
             mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
+            notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
             cursor.close();
         }
     }
@@ -226,6 +271,7 @@ public class EditCreateProfileFragment extends DialogFragment {
         Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL, notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
         if (isEdit) {
@@ -275,7 +321,9 @@ public class EditCreateProfileFragment extends DialogFragment {
         final AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         mediaVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+        notifVolumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION));
         mediaVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         ringVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_RING));
+        notifVolumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION));
     }
 }

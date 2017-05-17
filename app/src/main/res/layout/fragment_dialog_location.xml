@@ -89,10 +89,32 @@
         android:padding="8dp" />
 
     <ImageButton
-        android:id="@+id/media_sound"
+        android:id="@+id/wifiOn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/bluetooth"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/trigger_wifi"
+        android:padding="8dp"
+        android:src="@drawable/ic_signal_wifi_4_bar_brown" />
+
+    <Spinner
+        android:id="@+id/content_iswifion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bluetooth"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@id/wifiOn"
+        android:gravity="center_vertical"
+        android:padding="8dp" />
+
+
+    <ImageButton
+        android:id="@+id/media_sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wifiOn"
         android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_media_volume"
@@ -103,7 +125,7 @@
         android:id="@+id/media_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bluetooth"
+        android:layout_below="@id/wifiOn"
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/media_sound"
         android:padding="8dp" />
@@ -127,34 +149,37 @@
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/ring_volume"
         android:padding="8dp" />
-
     <ImageButton
-        android:id="@+id/wifiOn"
+        android:id="@+id/notif_volume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/ring_seekbar"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_centerVertical="true"
         android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_wifi"
+        android:contentDescription="@string/trigger_ring_volume"
         android:padding="8dp"
-        android:src="@drawable/ic_signal_wifi_4_bar_brown" />
+        android:src="@drawable/ic_notifications_black_24dp" />
 
-    <Spinner
-        android:id="@+id/content_iswifion"
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/notif_seekbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ring_seekbar"
-        android:layout_marginTop="8dp"
-        android:layout_toEndOf="@id/wifiOn"
-        android:gravity="center_vertical"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@id/ring_volume"
         android:padding="8dp" />
+
+
+
 
     <Button
         android:id="@+id/button_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/wifiOn"
+        android:layout_below="@id/notif_volume"
         android:layout_marginEnd="4dp"
         android:background="@color/colorAccent"
         android:text="@string/trigger_save" />
