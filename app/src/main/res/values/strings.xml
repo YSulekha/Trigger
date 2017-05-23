@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Trigger</string>
     <string name="action_settings">Settings</string>
     <string name="action_geofence">Geofence</string>
@@ -58,6 +58,7 @@
     <string name="bluetooth_error">To set the BLUETOOTH trigger, bluetooth should be enabled. Please enable the bluetooth and try again</string>
     <string name="wifi_error">To create a WIFI trigger, wifi should be enabled. Please enable the wifi and try again</string>
     <string name="loc_perm_exp">Permission required to access current location</string>
+    <string name="no_saved_wifi_bluetooth">There are no saved <xliff:g id="tiltle">%1$s</xliff:g> . To create a trigger there should be saved values</string>
 
     <string name="wifi_alert">Do you want to enable WIFI ?</string>
     <string name="wifi_alert_title">Wifi Settings</string>

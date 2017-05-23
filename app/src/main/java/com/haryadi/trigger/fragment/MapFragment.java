@@ -88,7 +88,7 @@ public class MapFragment extends Fragment implements
 
     boolean submitPressed = false;
 
-    ArrayList<MarkerOptions> markers = new ArrayList<>();
+    ArrayList<MarkerOptions> markers;
 
     public static final int REQUEST_ENABLE_BT = 201;
 
@@ -122,6 +122,7 @@ public class MapFragment extends Fragment implements
         View rootview = (ViewGroup) inflater.inflate(
                 R.layout.fragment_loc, container, false);
         ButterKnife.bind(this, rootview);
+        markers = new ArrayList<>();
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
@@ -149,7 +150,6 @@ public class MapFragment extends Fragment implements
             }
         });
         return rootview;
-
     }
 
     public void checkIfBluetoothEnabled(Context context) {
@@ -175,11 +175,17 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    public void checkIfThereAreSavedWifi(Context context){
-        ArrayList<String> names = ChangeSettings.getConfiguredWifi(getActivity());
-        if(names.size() == 0){
-            Toast.makeText(context,"There are no saved wifi",Toast.LENGTH_LONG).show();
+    public boolean checkIfThereAreSavedWifi(String title,Context context){
+        ArrayList<String> names;
+        if(title.equals(getString(R.string.wifi)))
+         names = ChangeSettings.getConfiguredWifi(getActivity());
+        else{
+            names = ChangeSettings.getConfiguredBluetooth(getActivity());
         }
+        if(names.size() == 0){
+            return false;
+        }
+        return true;
     }
 
     public View.OnClickListener getOnClick(final FloatingActionMenu fm) {
@@ -189,7 +195,6 @@ public class MapFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.wifi_enable) {
-                    checkIfThereAreSavedWifi(getActivity());
                     fm.close(true);
                     checkIfWifiEnabled(getActivity());
                 } else if (v.getId() == R.id.bluetooth_enable) {
@@ -205,13 +210,19 @@ public class MapFragment extends Fragment implements
     }
 
     private void showEditDialog(String title) {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title, false, null);
-        editNameDialogFragment.show(fm, title);
+        if( checkIfThereAreSavedWifi(title,getActivity())) {
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            EditCreateProfileFragment editNameDialogFragment = EditCreateProfileFragment.newInstance(title, false, null);
+            editNameDialogFragment.show(fm, title);
+        }
+        else{
+            Toast.makeText(getActivity(),getString(R.string.no_saved_wifi_bluetooth,title),Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onStart() {
+        Log.v("MapDeb","OnStart");
         mMapView.onStart();
         mGoogleApiClient.connect();
         super.onStart();
@@ -219,6 +230,7 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onResume() {
+        Log.v("MapDeb","OnResume");
         super.onResume();
         mMapView.onResume();
     }
@@ -226,16 +238,20 @@ public class MapFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.v("Inside onActivity","hhh");
         if(savedInstanceState==null) {
             mMapView.onCreate(null);
             mMapView.getMapAsync(this);
         }
         else{
+            Log.v("Inside onActivity","insideElse");
             mMapView.onCreate(savedInstanceState.getBundle(SAVE_MAP_STATE));
             mMapView.getMapAsync(this);
         }
         if(savedInstanceState!=null){
+            Log.v("Inside onActivity","insideIf2");
             if(savedInstanceState.containsKey(SAVE_MARKER)){
+                Log.v("Inside onActivity","insideIf3");
                 markers = savedInstanceState.getParcelableArrayList(SAVE_MARKER);
             }
         }
@@ -243,6 +259,7 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        Log.v("OnMapDe", "Save"+String.valueOf(markers.size()));
         Bundle mapState = new Bundle();
         mMapView.onSaveInstanceState(mapState);
         outState.putParcelable(SAVE_MAP_STATE,mapState);
@@ -253,6 +270,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
+        Log.v("MapDeb","onPause");
         mMapView.onPause();
 
     }
@@ -260,6 +278,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
+        Log.v("MapDeb","onStop");
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -274,6 +293,8 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        Log.v("Inside onMapRw","jjjj");
 
         try {
            //Styling the map using json
@@ -295,6 +316,7 @@ public class MapFragment extends Fragment implements
         map.setPadding(5,480,5,5);
         map.animateCamera(CameraUpdateFactory.zoomTo(1.0f));
         map.setOnMapLongClickListener(this);
+        Log.v("Inside onMapRw", String.valueOf(markers.size()));
         if(markers.size()>0){
             for(int i=0;i<markers.size();i++){
                 MarkerOptions latLng = markers.get(i);
