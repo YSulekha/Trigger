@@ -44,32 +44,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
+        android:layout_gravity="center"
         android:layout_toEndOf="@id/settings"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingStart="8dp">
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <RadioButton
             android:id="@+id/dialog_radio_connect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_enter"
-            android:buttonTint="@color/colorAccent"
-            android:fontFamily="sans-serif"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-             />
+            />
 
         <RadioButton
             android:id="@+id/dialog_radio_disconnect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_exit"
-            android:buttonTint="@color/colorAccent"
-            android:fontFamily="sans-serif"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             />
 
     </RadioGroup>
@@ -117,12 +109,7 @@
         android:gravity="center_vertical"
         android:padding="8dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/wifiOn"
-        android:id="@+id/vol_linear">
+
     <ImageButton
         android:id="@+id/media_sound"
         android:layout_width="wrap_content"
@@ -139,35 +126,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/wifiOn"
-        android:layout_marginTop="12dp"
-        android:layout_weight="1"
+        android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/media_sound"
         android:padding="8dp" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:background="@android:color/transparent"
-            android:layout_marginTop="10dp"
-            android:padding="8dp"
-            android:id = "@id/expand"
-            android:src = "@drawable/ic_keyboard_arrow_down_black_18dp"/>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/content_main_d"
-        android:visibility="gone"
-        android:layout_below="@id/vol_linear"
-        android:layout_width="wrap_content"
-        android:layout_marginRight="32dp"
-        android:layout_height="wrap_content">
 
     <ImageButton
         android:id="@+id/ring_volume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_below="@id/media_seekbar"
+        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_ring_volume"
         android:padding="8dp"
@@ -177,8 +145,8 @@
         android:id="@+id/ring_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="12dp"
+        android:layout_below="@id/media_seekbar"
+        android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/ring_volume"
         android:padding="8dp" />
     <ImageButton
@@ -186,7 +154,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/ring_seekbar"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:layout_centerVertical="true"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_ring_volume"
@@ -202,76 +170,13 @@
         android:layout_marginTop="16dp"
         android:layout_toEndOf="@id/ring_volume"
         android:padding="8dp" />
-        </RelativeLayout>
-
-
-    <ImageButton
-        android:id="@+id/contact"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_name"
-        android:padding="8dp"
-        android:layout_below="@id/content_main_d"
-        android:src="@drawable/ic_person_black_24dp" />
-
-    <EditText
-        android:id="@+id/contact_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/content_main_d"
-        android:layout_toEndOf="@id/contact"
-        android:hint="Add Contact"
-        android:editable="false"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:buttonTint="@color/colorAccent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:padding="8dp" />
-    <ImageButton
-        android:id="@+id/contact_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/content_main_d"
-        android:layout_toEndOf="@id/contact_num"
-        android:src="@drawable/ic_close_black_24dp"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"/>
-
-    <ImageButton
-        android:id="@+id/message"
-        android:visibility="gone"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_name"
-        android:padding="8dp"
-        android:layout_below="@id/contact_num"
-        android:src="@drawable/ic_message_black_24dp" />
-
-    <EditText
-        android:id="@+id/message_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/contact_num"
-        android:layout_toEndOf="@id/message"
-        android:visibility="gone"
-        android:hint="Add text here"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:buttonTint="@color/colorAccent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:padding="8dp" />
 
     <Button
         android:id="@+id/button_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/message"
+        android:layout_below="@id/notif_volume"
         android:layout_marginEnd="4dp"
         android:background="@color/colorAccent"
         android:text="@string/trigger_save" />

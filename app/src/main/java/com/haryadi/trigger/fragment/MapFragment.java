@@ -88,7 +88,7 @@ public class MapFragment extends Fragment implements
 
     boolean submitPressed = false;
 
-    ArrayList<MarkerOptions> markers;
+    ArrayList<MarkerOptions> markers =  new ArrayList<>();
 
     public static final int REQUEST_ENABLE_BT = 201;
 
@@ -121,13 +121,17 @@ public class MapFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = (ViewGroup) inflater.inflate(
                 R.layout.fragment_loc, container, false);
+
         ButterKnife.bind(this, rootview);
-        markers = new ArrayList<>();
+      //  markers =
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
                 addApi(LocationServices.API).
                 build();
+
+
+        Log.v("OnCreateView", String.valueOf(markers.size()));
 
         EditText search = (EditText) rootview.findViewById(R.id.toolbarText);
         search.setOnClickListener(new View.OnClickListener() {
@@ -222,7 +226,6 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onStart() {
-        Log.v("MapDeb","OnStart");
         mMapView.onStart();
         mGoogleApiClient.connect();
         super.onStart();
@@ -230,7 +233,6 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onResume() {
-        Log.v("MapDeb","OnResume");
         super.onResume();
         mMapView.onResume();
     }
@@ -238,20 +240,16 @@ public class MapFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v("Inside onActivity","hhh");
         if(savedInstanceState==null) {
             mMapView.onCreate(null);
             mMapView.getMapAsync(this);
         }
         else{
-            Log.v("Inside onActivity","insideElse");
             mMapView.onCreate(savedInstanceState.getBundle(SAVE_MAP_STATE));
             mMapView.getMapAsync(this);
         }
         if(savedInstanceState!=null){
-            Log.v("Inside onActivity","insideIf2");
             if(savedInstanceState.containsKey(SAVE_MARKER)){
-                Log.v("Inside onActivity","insideIf3");
                 markers = savedInstanceState.getParcelableArrayList(SAVE_MARKER);
             }
         }
@@ -259,7 +257,6 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.v("OnMapDe", "Save"+String.valueOf(markers.size()));
         Bundle mapState = new Bundle();
         mMapView.onSaveInstanceState(mapState);
         outState.putParcelable(SAVE_MAP_STATE,mapState);
@@ -270,7 +267,6 @@ public class MapFragment extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
-        Log.v("MapDeb","onPause");
         mMapView.onPause();
 
     }
@@ -278,7 +274,6 @@ public class MapFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
-        Log.v("MapDeb","onStop");
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -294,7 +289,6 @@ public class MapFragment extends Fragment implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        Log.v("Inside onMapRw","jjjj");
 
         try {
            //Styling the map using json
@@ -316,7 +310,6 @@ public class MapFragment extends Fragment implements
         map.setPadding(5,480,5,5);
         map.animateCamera(CameraUpdateFactory.zoomTo(1.0f));
         map.setOnMapLongClickListener(this);
-        Log.v("Inside onMapRw", String.valueOf(markers.size()));
         if(markers.size()>0){
             for(int i=0;i<markers.size();i++){
                 MarkerOptions latLng = markers.get(i);

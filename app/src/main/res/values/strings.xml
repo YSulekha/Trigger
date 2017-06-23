@@ -30,8 +30,8 @@
     <string name="trigger_loc_hint">Add a nick name</string>
     <string name="trigger_search_hint">Search to add a location based trigger</string>
 
-    <string name="settings_connect">On Connect</string>
-    <string name="settings_disconnect">On Disconnect</string>
+    <string name="settings_connect">On connect</string>
+    <string name="settings_disconnect">On disconnect</string>
     <string name="settings_enter">On Enter</string>
     <string name="settings_exit">On Exit</string>
 

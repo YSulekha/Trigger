@@ -1,18 +1,21 @@
 package com.haryadi.trigger.fragment;
 
-import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +24,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -72,6 +77,19 @@ public class EditCreateProfileFragment extends DialogFragment {
     ImageButton imageButton;
     @BindView(R.id.wifi_name_text)
     TextView wifiNameText;
+
+    @BindView(R.id.expand)ImageButton buttonExpand;
+    @BindView(R.id.content_main_d) RelativeLayout relate;
+    @BindView(R.id.contact_num)
+    EditText con;
+
+    @BindView(R.id.message) ImageButton messageButton;
+    @BindView(R.id.message_text) TextView messageText;
+    @BindView(R.id.contact_close) ImageButton contactClose;
+
+    String contactName;
+
+    public static final int PICK_CONTACT = 100;
     String triggerPoint;
     ArrayList<String> names;
     ArrayAdapter<CharSequence> optionsAdapter;
@@ -79,8 +97,11 @@ public class EditCreateProfileFragment extends DialogFragment {
     String isConnect;
     boolean isEdit = false;
     Uri mUri;
+    String id;
+    String ph_number;
 
     public static final int REQUEST_SMS = 100;
+    public static final int SEND_SMS = 101;
 
 
     public EditCreateProfileFragment() {
@@ -112,7 +133,7 @@ public class EditCreateProfileFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dialog, container);
+        return inflater.inflate(R.layout.frag_dialog_drop, container);
     }
 
     @Override
@@ -125,7 +146,6 @@ public class EditCreateProfileFragment extends DialogFragment {
         names = new ArrayList<>();
         if (triggerPoint.equals(getString(wifi))) {
             names = ChangeSettings.getConfiguredWifi(getActivity());
-            Toast.makeText(getActivity(),"Size"+names.size(),Toast.LENGTH_LONG).show();
             imageButton.setImageResource(R.drawable.ic_wifi_brown);
         }
         if (triggerPoint.equals(getString(R.string.bluetooth))) {
@@ -143,8 +163,97 @@ public class EditCreateProfileFragment extends DialogFragment {
                 onRadioButtonClicked(checkedId);
             }
         });
+        if(savedInstanceState != null){
+
+            if(con.getText().toString().length()>0){
+                messageText.setVisibility(View.VISIBLE);
+                messageButton.setVisibility(View.VISIBLE);
+            }
+        }
+        //Expand exp
+        buttonExpand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(relate.isShown()) {
+                   ChangeSettings.slide_up(getActivity(),relate);
+                    relate.setVisibility(View.GONE);
+                }
+                else{
+                    ChangeSettings.slide_down(getActivity(),relate);
+                    relate.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        //msg exp
+        con.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+              //  checkpermission();
+                Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(intent, PICK_CONTACT);
+            }
+        });
+
+        contactClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                con.setText("");
+                ph_number = null;
+                messageText.setText("");
+                messageButton.setVisibility(View.GONE);
+                messageText.setVisibility(View.GONE);
+            }
+        });
+
+        ringVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(progress == 0){
+                    Vibrator v = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                    v.vibrate(300);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+        switch (reqCode) {
+            case (PICK_CONTACT) :
+                Log.v("Inside ddsf","resul ok");
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor c =  getContext().getContentResolver().query(contactData, null, null, null, null);
+                    if (c.moveToFirst()) {
+                        contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        id= c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                        if(Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
+                            checkpermission();
+                        }
+                        else{
+                            Toast.makeText(getActivity(),"No Number associated with this contact.Choose another one",Toast.LENGTH_LONG).show();
+                        }
+
+
+                    }
+                }
+
+                break;
+        }
+    }
     public void onRadioButtonClicked(int id) {
         switch (id) {
             case R.id.dialog_radio_connect:
@@ -180,27 +289,93 @@ public class EditCreateProfileFragment extends DialogFragment {
     }
 
     public void checkpermission() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            int hasSMSPermission = getActivity().checkSelfPermission(Manifest.permission.SEND_SMS);
-            if (hasSMSPermission != PackageManager.PERMISSION_GRANTED) {
-                if (!shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+        Log.v("ooo2","Cheack Permission");
+                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),android.Manifest.permission.READ_CONTACTS)) {
                     showMessageOKCancel("You need to allow access to Send SMS",
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        getActivity().requestPermissions(new String[]{Manifest.permission.SEND_SMS},
+                                    requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
                                                 REQUEST_SMS);
-                                    }
                                 }
                             });
                     return;
                 }
-                getActivity().requestPermissions(new String[]{Manifest.permission.SEND_SMS},
+                else{
+            requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
                         REQUEST_SMS);
-                return;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_SMS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        int hasSMSPermission = ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.READ_CONTACTS);
+                        if (hasSMSPermission == PackageManager.PERMISSION_GRANTED) {
+                           // Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
+                           // startActivityForResult(intent, PICK_CONTACT);
+                            requestPermissions(new String[]{android.Manifest.permission.SEND_SMS},
+                                    SEND_SMS);
+                        /*    Log.v("ooo1","onRequestPermissionsResult");
+                            Cursor pCur = getContext().getContentResolver().query(
+                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                    null,
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                    new String[]{id}, null);
+                            while (pCur.moveToNext()) {
+                                Log.v("Has NUmber",pCur.toString());
+                                ph_number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                con.setText(ph_number);
+                            }
+                            pCur.close();*/
+                        }
+                        return;
+
+                } else {
+                    checkpermission();
+                }
+                break;
             }
-            ChangeSettings.sendMessage();
+            case SEND_SMS:{
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    int hasSMSPermission = ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.SEND_SMS);
+                    if (hasSMSPermission == PackageManager.PERMISSION_GRANTED) {
+                        // Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
+                        // startActivityForResult(intent, PICK_CONTACT);
+                        Cursor pCur = getContext().getContentResolver().query(
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                new String[]{id}, null);
+
+                        if(pCur.getCount() == 0){
+                            Toast.makeText(getActivity(),"No number",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            while (pCur.moveToNext()) {
+                                ph_number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                con.setText(contactName);
+                                messageButton.setVisibility(View.VISIBLE);
+                                messageText.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        pCur.close();
+                    }
+                    return;
+
+                } else {
+                    checkpermission();
+                }
+                break;
+            }
+
+
         }
     }
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
@@ -262,9 +437,18 @@ public class EditCreateProfileFragment extends DialogFragment {
             mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
             notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
+            messageText.setText(cursor.getString(ChangeSettings.INDEX_MSGTEXT));
+            ph_number = cursor.getString(ChangeSettings.INDEX_PHNUMBER);
+            if(ph_number != null) {
+                con.setText(ChangeSettings.getDisplayNameByNumber(getActivity(), ph_number));
+                messageButton.setVisibility(View.VISIBLE);
+                messageText.setVisibility(View.VISIBLE);
+            }
             cursor.close();
         }
     }
+
+
 
     private void insertRecord() {
         ContentValues values = new ContentValues();
@@ -274,12 +458,13 @@ public class EditCreateProfileFragment extends DialogFragment {
         values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL, notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
+        values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,ph_number);
+        values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,messageText.getText().toString());
         if (isEdit) {
             values.put(TriggerContract.TriggerEntry.COLUMN_NAME, wifiNameText.getText().toString());
             updateRecord(values);
         } else {
             String name = mWifiName.getSelectedItem().toString();
-            Log.v("NameDialog",name);
             values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
             ChangeSettings.addWifiNameToSharedPreference(getActivity());
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);

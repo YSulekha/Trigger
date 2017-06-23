@@ -6,9 +6,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
@@ -34,6 +36,11 @@ public class GeofenceTrasitionService extends IntentService {
     public static final String SHARED_LAST_WIFI = "wifi_name";
     public static final String SHARED_LAST_BLUETOOTH = "bluetooth_name";
     public static final String SHARED_LAST_TRIGGER = "last_trigger";
+    public static final String SHARED_LAST_CONNECTTIME = "connecttime";
+    public static final String SHARED_LAST_DISCONNECTTIME = "disconnecttime";
+    public static final String SHARED_LAST_CONNECT_NAME = "connectName";
+    public static final String SHARED_LAST_DISCONNECT_NAME = "disconnectName";
+    public static final String SHARED_LAST_MSG_TIME = "msg_time";
 
     public GeofenceTrasitionService() {
         super("GeofenceTrasitionService");
@@ -66,7 +73,7 @@ public class GeofenceTrasitionService extends IntentService {
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences);
             if(checkDatabase(triggeringGeofences, geoFenceTransition)) {
                 // Send notification details as a String
-                sendNotification(geofenceTransitionDetails);
+               // sendNotification(geofenceTransitionDetails);
             }
         }
     }
@@ -104,6 +111,20 @@ public class GeofenceTrasitionService extends IntentService {
                     ChangeSettings.changeMediaVolume(this, c.getInt(ChangeSettings.INDEX_MEDIAVOL));
                     ChangeSettings.changeRingVolume(this, c.getInt(ChangeSettings.INDEX_RINGVOL));
                     ChangeSettings.changeNotificationVolume(this, c.getInt(ChangeSettings.INDEX_NOTIFVOL));
+                    String ph_number = c.getString(ChangeSettings.INDEX_PHNUMBER);
+                    String message = c.getString(ChangeSettings.INDEX_MSGTEXT);
+                    SharedPreferences prefs1 = PreferenceManager.getDefaultSharedPreferences(this);
+                    long lastmsgTime = prefs1.getLong(GeofenceTrasitionService.SHARED_LAST_MSG_TIME,-1);
+                //    if(System.currentTimeMillis() - lastmsgTime >= 1200*1000) {
+                        if (ph_number != null) {
+                            //   ChangeSettings.sendMessage(c.getString(ChangeSettings.INDEX_PHNUMBER), message);
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                            SharedPreferences.Editor edit = prefs.edit();
+                            edit.putLong(GeofenceTrasitionService.SHARED_LAST_MSG_TIME,System.currentTimeMillis());
+                            edit.commit();
+                            sendNotification("sentMsg "+connect+" "+message);
+                        }
+                   // }
                     ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
                     ChangeSettings.notifyWidgets(this);
                     return true;

@@ -7,15 +7,21 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.telephony.SmsManager;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.haryadi.trigger.R;
@@ -39,7 +45,9 @@ public class ChangeSettings {
             TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON,
             TriggerContract.TriggerEntry.COLUMN_MEDIAVOL,
             TriggerContract.TriggerEntry.COLUMN_RINGVOL,
-            TriggerContract.TriggerEntry.COLUMN_NOTIFVOL
+            TriggerContract.TriggerEntry.COLUMN_NOTIFVOL,
+            TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,
+            TriggerContract.TriggerEntry.COLUMN_MSG_TEXT
     };
 
     public static final int INDEX_TRIGGER_ID = 0;
@@ -52,6 +60,8 @@ public class ChangeSettings {
     public static final int INDEX_MEDIAVOL = 7;
     public static final int INDEX_RINGVOL = 8;
     public static final int INDEX_NOTIFVOL = 9;
+    public static final int INDEX_PHNUMBER = 10;
+    public static final int INDEX_MSGTEXT = 11;
 
     public static final String ACTION_DATA_UPDATED = "com.haryadi.trigger.ACTION_DATA_UPDATED";
 
@@ -189,9 +199,55 @@ public class ChangeSettings {
         mContext.sendBroadcast(intent);
     }
 
-    public static void sendMessage(){
+    public static void sendMessage(String number, String message){
         SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage("+1 6503355397",null,"Testing Trigger",null,null);
+        smsManager.sendTextMessage(number,null,message,null,null);
     }
+
+    public static void slide_down(Context ctx, View v){
+
+        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
+        if(a != null){
+            a.reset();
+            if(v != null){
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
+
+    public static void slide_up(Context ctx, View v){
+
+        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
+        if(a != null){
+            a.reset();
+            if(v != null){
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
+
+    public static String getDisplayNameByNumber(Context context, String number) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+
+        Cursor contactLookup = context.getContentResolver().query(uri, new String[] {ContactsContract.PhoneLookup._ID,
+                ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+
+        int indexName = contactLookup.getColumnIndex(ContactsContract.Data.DISPLAY_NAME);
+
+        try {
+            if (contactLookup != null && contactLookup.moveToNext()) {
+                number = contactLookup.getString(indexName);
+            }
+        } finally {
+            if (contactLookup != null) {
+                contactLookup.close();
+            }
+        }
+
+        return number;
+    }
+
 
 }

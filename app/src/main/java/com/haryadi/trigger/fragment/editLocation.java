@@ -1,19 +1,21 @@
 package com.haryadi.trigger.fragment;
 
-import android.app.Activity;
+/**
+ * Created by aharyadi on 6/8/17.
+ */
+
+public class editLocation {
+    /*
+    package com.haryadi.trigger.fragment;
+
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -139,54 +141,6 @@ public class EditCreateLocationFragment extends DialogFragment {
                 onRadioButtonClicked(checkedId);
             }
         });
-
-        //Screen Rotation
-        if(savedInstanceState != null){
-
-            if(con.getText().toString().length()>0){
-                messageText.setVisibility(View.VISIBLE);
-                messageButton.setVisibility(View.VISIBLE);
-            }
-        }
-        //Expand exp
-        buttonExpand.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(relate.isShown()) {
-                    ChangeSettings.slide_up(getActivity(),relate);
-                    relate.setVisibility(View.GONE);
-                }
-                else{
-                    ChangeSettings.slide_down(getActivity(),relate);
-                    relate.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        //msg exp
-        con.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //  checkpermission();
-             //   con.setText("");
-                con.setFocusableInTouchMode(true);
-                Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
-                startActivityForResult(intent, PICK_CONTACT);
-            }
-        });
-
-        //Close Button
-        contactClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                con.setText("");
-                ph_number = null;
-                messageText.setText("");
-                messageButton.setVisibility(View.GONE);
-                messageText.setVisibility(View.GONE);
-            }
-        });
-
         ringVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -207,136 +161,6 @@ public class EditCreateLocationFragment extends DialogFragment {
             }
         });
     }
-
-    @Override
-    public void onActivityResult(int reqCode, int resultCode, Intent data) {
-        super.onActivityResult(reqCode, resultCode, data);
-
-        switch (reqCode) {
-            case (PICK_CONTACT) :
-                Log.v("Inside ddsf","resul ok");
-                if (resultCode == Activity.RESULT_OK) {
-                    Uri contactData = data.getData();
-                    Cursor c =  getContext().getContentResolver().query(contactData, null, null, null, null);
-                    if (c.moveToFirst()) {
-                        contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                        id= c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
-                        if(Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
-                            checkpermission();
-                        }
-                        else{
-                            Toast.makeText(getActivity(),"No Number associated with this contact.Choose another one",Toast.LENGTH_LONG).show();
-                        }
-
-                        // TODO Fetch other Contact details as you want to use
-
-                    }
-                }
-
-                break;
-        }
-    }
-
-    public void checkpermission() {
-        Log.v("ooo2","Cheack Permission");
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),android.Manifest.permission.READ_CONTACTS)) {
-            showMessageOKCancel("You need to allow access to Send SMS",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.v("oo03","OnClick");
-                            requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
-                                    REQUEST_SMS);
-                        }
-                    });
-            return;
-        }
-        else{
-            Log.v("ooo2","OnElse");
-            requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
-                    REQUEST_SMS);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_SMS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    int hasSMSPermission = ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.READ_CONTACTS);
-                    if (hasSMSPermission == PackageManager.PERMISSION_GRANTED) {
-                        // Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
-                        // startActivityForResult(intent, PICK_CONTACT);
-                        requestPermissions(new String[]{android.Manifest.permission.SEND_SMS},
-                                SEND_SMS);
-                        /*    Log.v("ooo1","onRequestPermissionsResult");
-                            Cursor pCur = getContext().getContentResolver().query(
-                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                    null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                                    new String[]{id}, null);
-                            while (pCur.moveToNext()) {
-                                Log.v("Has NUmber",pCur.toString());
-                                ph_number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                                con.setText(ph_number);
-                            }
-                            pCur.close();*/
-                    }
-                    return;
-
-                } else {
-                    checkpermission();
-                }
-                break;
-            }
-            case SEND_SMS:{
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    int hasSMSPermission = ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.SEND_SMS);
-                    if (hasSMSPermission == PackageManager.PERMISSION_GRANTED) {
-                        // Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
-                        // startActivityForResult(intent, PICK_CONTACT);
-                        Cursor pCur = getContext().getContentResolver().query(
-                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                null,
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                                new String[]{id}, null);
-                        if(pCur.getCount() == 0){
-                            Toast.makeText(getActivity(),"No number",Toast.LENGTH_LONG).show();
-                        }
-                        else {
-                            while (pCur.moveToNext()) {
-                                ph_number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                                con.setText(contactName);
-                                messageButton.setVisibility(View.VISIBLE);
-                                messageText.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        pCur.close();
-                    }
-                    return;
-
-                } else {
-                    checkpermission();
-                }
-                break;
-            }
-
-
-        }
-    }
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new android.support.v7.app.AlertDialog.Builder(getActivity())
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
-
 
     public void onRadioButtonClicked(int id) {
         Log.v("OnClick", "onClick");
@@ -386,13 +210,6 @@ public class EditCreateLocationFragment extends DialogFragment {
             mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
             notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
-            messageText.setText(cursor.getString(ChangeSettings.INDEX_MSGTEXT));
-            ph_number = cursor.getString(ChangeSettings.INDEX_PHNUMBER);
-            if(ph_number != null) {
-                con.setText(ChangeSettings.getDisplayNameByNumber(getActivity(), ph_number));
-                messageButton.setVisibility(View.VISIBLE);
-                messageText.setVisibility(View.VISIBLE);
-            }
             cursor.close();
         }
     }
@@ -407,8 +224,6 @@ public class EditCreateLocationFragment extends DialogFragment {
         values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL,notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-        values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,ph_number);
-        values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,messageText.getText().toString());
         if (isEdit) {
             updateRecord(values);
         } else {
@@ -479,4 +294,7 @@ public class EditCreateLocationFragment extends DialogFragment {
             }
         }
     }
+}
+
+     */
 }

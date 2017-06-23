@@ -49,6 +49,11 @@ public class TriggerContract {
         //brightness setting
         public static final String COLUMN_BRIGHTNESS = "brightness";
 
+        //Column for message number
+        public static final String COLUMN_PH_NUMBER = "phone_number";
+        //Column for message text
+        public static final String COLUMN_MSG_TEXT = "msg_text";
+
         //returns uri with appended id
         public static Uri buildTaskUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
