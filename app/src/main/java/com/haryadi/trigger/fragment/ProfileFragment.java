@@ -64,7 +64,7 @@ public class ProfileFragment extends Fragment implements LoaderManager.LoaderCal
             public void onClick(Uri uri, String trigger) {
                 if (trigger.equals(getString(R.string.location))) {
                     FragmentManager fm = getActivity().getSupportFragmentManager();
-                    EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri, null);
+                    EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null, null);
                     editLocationDialogFragment.show(fm, "Edit");
                 } else {
                     FragmentManager fm = getActivity().getSupportFragmentManager();

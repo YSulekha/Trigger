@@ -5,10 +5,10 @@
     android:id="@+id/content_main"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
     android:background="@drawable/dialog_border">
 
     <ImageButton
@@ -17,7 +17,10 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_name"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
         android:src="@drawable/ic_wifi_brown" />
 
     <Spinner
@@ -29,13 +32,16 @@
         android:fontFamily="sans-serif-medium"
         android:buttonTint="@color/colorAccent"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:padding="8dp" />
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+         />
 
     <TextView
         android:id="@+id/wifi_name_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/name"
+        android:layout_alignBottom="@id/name"
         android:hint="@string/trigger_loc_hint"
         android:padding="8dp"
         android:paddingStart="8dp"
@@ -49,10 +55,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_settings"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
         android:src="@drawable/ic_settings_brown" />
 
     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
@@ -62,11 +70,8 @@
         android:layout_below="@id/name"
         android:layout_toEndOf="@id/settings"
         android:orientation="vertical"
-        android:layout_marginTop="8dp"
-        android:paddingEnd="8dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingStart="8dp">
+        android:paddingBottom="8dp"
+        android:paddingTop="6dp">
 
         <RadioButton
             android:id="@+id/dialog_radio_connect"
@@ -95,118 +100,122 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/isConnect"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_bluetooth"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
         android:src="@drawable/ic_settings_bluetooth_brown" />
 
 
     <Spinner
         android:id="@+id/content_isbluetoothon"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/isConnect"
-        android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/bluetooth"
         android:fontFamily="sans-serif"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:padding="8dp"
-        android:dropDownWidth="match_parent"
-        android:dropDownSelector="?attr/panelBackground"
-        android:entries="@array/options" />
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+       />
 
     <ImageButton
         android:id="@+id/wifiOn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/bluetooth"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_wifi"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
         android:src="@drawable/ic_signal_wifi_4_bar_brown" />
 
     <Spinner
         android:id="@+id/content_iswifion"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bluetooth"
         android:fontFamily="sans-serif-medium"
         android:buttonTint="@color/colorAccent"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_marginTop="8dp"
         android:layout_toEndOf="@id/wifiOn"
         android:gravity="center_vertical"
-        android:padding="8dp" />
-
-
-
-
-    <ImageButton
-        android:id="@+id/media_sound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/wifiOn"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_media_volume"
-        android:padding="8dp"
-        android:src="@drawable/ic_music_note_brown" />
-
-    <SeekBar
-        android:id="@+id/media_seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/wifiOn"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="12dp"
-        android:layout_toEndOf="@id/media_sound"
-        android:padding="8dp" />
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp" />
 
     <ImageButton
         android:id="@+id/ring_volume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/media_seekbar"
-        android:layout_marginTop="8dp"
-        android:layout_centerVertical="true"
+        android:layout_below="@id/wifiOn"
         android:background="@android:color/transparent"
         android:contentDescription="@string/trigger_ring_volume"
-        android:padding="8dp"
-        android:src="@drawable/ic_ring_volume_brown" />
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
+        android:src="@drawable/ic_ring_volume_brown"/>
 
     <SeekBar
         android:id="@+id/ring_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/media_seekbar"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="16dp"
+        android:layout_below="@id/wifiOn"
+        android:paddingTop="12dp"
         android:layout_toEndOf="@id/ring_volume"
-        android:padding="8dp" />
+         />
+
+    <ImageButton
+        android:id="@+id/media_sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ring_seekbar"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/trigger_media_volume"
+        android:layout_marginTop="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
+        android:src="@drawable/ic_music_note_brown"
+         />
+
+    <SeekBar
+        android:id="@+id/media_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ring_seekbar"
+        android:layout_toEndOf="@id/media_sound"
+        android:paddingTop="12dp"
+        android:layout_marginTop="8dp"/>
 
     <ImageButton
         android:id="@+id/notif_volume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ring_seekbar"
+        android:layout_below="@id/media_seekbar"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
         android:layout_marginTop="8dp"
-        android:layout_centerVertical="true"
         android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_ring_volume"
-        android:padding="8dp"
+        android:contentDescription="@string/trigger_notif_volume"
         android:src="@drawable/ic_notifications_black_24dp" />
 
     <SeekBar
         android:id="@+id/notif_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ring_seekbar"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="10dp"
-        android:layout_toEndOf="@id/ring_volume"
-        android:padding="8dp" />
+        android:layout_below="@id/media_seekbar"
+        android:paddingTop="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@id/media_sound"
+         />
 
 
     <Button
@@ -215,48 +224,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/notif_seekbar"
-        android:layout_marginEnd="12dp"
         android:layout_marginTop="8dp"
         android:background="@color/colorAccent"
         android:text="@string/trigger_save" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_save"
-        android:id = "@+id/expand"
-        android:src = "@drawable/list_icon"/>
-
-    <RelativeLayout
-        android:id="@+id/content_main_d"
-        android:visibility="gone"
-        android:layout_below="@id/expand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="@dimen/activity_vertical_margin"
-       >
-
-        <ImageButton
-            android:id="@+id/contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/trigger_name"
-            android:padding="8dp"
-            android:src="@drawable/ic_wifi_brown" />
-
-        <TextView
-            android:id="@+id/contact_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/contact"
-            android:text="Add Contact"
-            android:fontFamily="sans-serif-medium"
-            android:buttonTint="@color/colorAccent"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:padding="8dp" />
-        </RelativeLayout>
 
 </RelativeLayout>

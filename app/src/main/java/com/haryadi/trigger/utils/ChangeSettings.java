@@ -47,7 +47,9 @@ public class ChangeSettings {
             TriggerContract.TriggerEntry.COLUMN_RINGVOL,
             TriggerContract.TriggerEntry.COLUMN_NOTIFVOL,
             TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,
-            TriggerContract.TriggerEntry.COLUMN_MSG_TEXT
+            TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,
+            TriggerContract.TriggerEntry.COLUMN_LAT,
+            TriggerContract.TriggerEntry.COLUMN_LONG,
     };
 
     public static final int INDEX_TRIGGER_ID = 0;
@@ -62,6 +64,8 @@ public class ChangeSettings {
     public static final int INDEX_NOTIFVOL = 9;
     public static final int INDEX_PHNUMBER = 10;
     public static final int INDEX_MSGTEXT = 11;
+    public static final int INDEX_LATITUDE = 12;
+    public static final int INDEX_LONGITUDE = 13;
 
     public static final String ACTION_DATA_UPDATED = "com.haryadi.trigger.ACTION_DATA_UPDATED";
 

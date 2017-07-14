@@ -6,11 +6,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -29,10 +27,10 @@ public class ChangeSettingsIntentService extends IntentService {
 
     public static final String EXTRA_CONNECT = "isConnect";
     public static final String EXTRA_NAME = "name";
-    public static final String EXTRA_LAST_WIFI_CONNECT = "wificonnect";
+ /*   public static final String EXTRA_LAST_WIFI_CONNECT = "wificonnect";
     public static final String EXTRA_LAST_WIFI_DISCONNECT = "wifidisconnect";
     public static final String EXTRA_LAST_WIFI_CONNECT_TIME = "wificonnecttime";
-    public static final String EXTRA_LAST_WIFI_DISCONNECT_TIME = "wifidisconnecttime";
+    public static final String EXTRA_LAST_WIFI_DISCONNECT_TIME = "wifidisconnecttime";*/
 
     public ChangeSettingsIntentService() {
         super(ChangeSettingsIntentService.class.getName());
@@ -45,11 +43,12 @@ public class ChangeSettingsIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String name = intent.getStringExtra(EXTRA_NAME);
+        String connectInfo;
         boolean isConnect = intent.getBooleanExtra(EXTRA_CONNECT, false);
-        long connectTime = intent.getLongExtra(EXTRA_LAST_WIFI_CONNECT_TIME,0);
+     /*   long connectTime = intent.getLongExtra(EXTRA_LAST_WIFI_CONNECT_TIME,0);
         long disconnectTime = intent.getLongExtra(EXTRA_LAST_WIFI_DISCONNECT_TIME,0);
         String connectName = intent.getStringExtra(EXTRA_LAST_WIFI_CONNECT);
-        String disconnectName = intent.getStringExtra(EXTRA_LAST_WIFI_DISCONNECT);
+        String disconnectName = intent.getStringExtra(EXTRA_LAST_WIFI_DISCONNECT);*/
         Cursor c = getData(name, isConnect);
         if (c != null) {
             String bluetooth = c.getString(ChangeSettings.INDEX_ISBLUETOOTHON);
@@ -67,7 +66,7 @@ public class ChangeSettingsIntentService extends IntentService {
             ChangeSettings.changeMediaVolume(this, c.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ChangeSettings.changeRingVolume(this, c.getInt(ChangeSettings.INDEX_RINGVOL));
             ChangeSettings.changeNotificationVolume(this, c.getInt(ChangeSettings.INDEX_NOTIFVOL));
-            String ph_number = c.getString(ChangeSettings.INDEX_PHNUMBER);
+      /*      String ph_number = c.getString(ChangeSettings.INDEX_PHNUMBER);
             String message = c.getString(ChangeSettings.INDEX_MSGTEXT);
             SharedPreferences prefs1 = PreferenceManager.getDefaultSharedPreferences(this);
            // long lastmsgTime = prefs1.getLong(GeofenceTrasitionService.SHARED_LAST_MSG_TIME,-1);
@@ -86,9 +85,15 @@ public class ChangeSettingsIntentService extends IntentService {
                     edit.commit();
                     sendNotification("sentMsg" + name);
                 }
-            }
+            }*/
             ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
             ChangeSettings.notifyWidgets(this);
+            if (isConnect) {
+                connectInfo = getString(R.string.text_connect);
+            } else {
+            connectInfo = getString(R.string.text_disconnect);
+            }
+            sendNotification(name+" "+connectInfo);
             c.close();
         }
     }

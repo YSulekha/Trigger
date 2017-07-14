@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.fragment.MapFragment;
@@ -53,6 +55,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         mCursor.moveToPosition(position);
         deleteValues = new ContentValues();
         String name = mCursor.getString(ChangeSettings.INDEX_NAME);
+        String triggerPoint = mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, mCursor.getString(ChangeSettings.INDEX_TRIGGER_NAME));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_NAME, mCursor.getString(ChangeSettings.INDEX_NAME));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, mCursor.getString(ChangeSettings.INDEX_CONNECT));
@@ -62,6 +65,10 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, mCursor.getString(ChangeSettings.INDEX_RINGVOL));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL, mCursor.getString(ChangeSettings.INDEX_NOTIFVOL));
         deleteValues.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER, mCursor.getString(ChangeSettings.INDEX_PHNUMBER));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT, mCursor.getString(ChangeSettings.INDEX_MSGTEXT));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_LAT, mCursor.getDouble(ChangeSettings.INDEX_LATITUDE));
+        deleteValues.put(TriggerContract.TriggerEntry.COLUMN_LONG, mCursor.getDouble(ChangeSettings.INDEX_LONGITUDE));
         deletePosition = position;
         long id = mCursor.getLong(mCursor.getColumnIndex(TriggerContract.TriggerEntry._ID));
         String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
@@ -69,11 +76,16 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         String[] args = new String[]{Long.toString(id)};
         mContext.getContentResolver().delete(TriggerContract.TriggerEntry.CONTENT_URI, where, args);
         notifyItemRemoved(position);
-        ArrayList<String> rem = new ArrayList<>();
-        rem.add(name);
+        if (triggerPoint.equals(mContext.getString(R.string.location))) {
+            ArrayList<String> rem = new ArrayList<>();
+            rem.add(name);
 
-        LocationServices.GeofencingApi.removeGeofences(MapFragment.mGoogleApiClient,rem);
-        Log.v("GoogleApiClient", String.valueOf(MapFragment.mGoogleApiClient.isConnected()));
+            LocationServices.GeofencingApi.removeGeofences(MapFragment.mGoogleApiClient, rem);
+            Marker m = MapFragment.markerMap.get(id);
+            m.remove();
+            Circle c = MapFragment.circleMap.get(id);
+            c.remove();
+        }
 
 
         Toast.makeText(mContext, mContext.getString(R.string.trigger_deleted), Toast.LENGTH_LONG).show();
@@ -110,7 +122,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String name = mCursor.getString(ChangeSettings.INDEX_NAME);
-        Log.v("BindViewHolder",name);
         String triggerPoint = mCursor.getString(ChangeSettings.INDEX_TRIGGER_POINT);
         holder.profileConnect.setText(mCursor.getString(ChangeSettings.INDEX_CONNECT));
         if (triggerPoint.equals(mContext.getString(R.string.wifi))) {
@@ -122,15 +133,18 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         } else {
             holder.profileImage.setImageResource(R.drawable.location_green);
             holder.profileName.setText(name);
+            if (mCursor.getString(ChangeSettings.INDEX_CONNECT).equals(mContext.getString(R.string.text_connect))) {
+                holder.profileConnect.setText(mContext.getString(R.string.text_enter));
+            } else {
+                holder.profileConnect.setText(mContext.getString(R.string.text_exit));
+            }
         }
         setAnimation(holder.itemView, position);
     }
 
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition)
-        {
+        if (position > lastPosition) {
             Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
@@ -168,18 +182,20 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 @Override
                 public void onClick(View view) {
                     if (deleteValues != null) {
-                        mContext.getContentResolver().insert(TriggerContract.TriggerEntry.CONTENT_URI, deleteValues);
-                        if(deleteValues.get(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT).equals(mContext.getString(R.string.location))){
-                            Toast.makeText(mContext, "Location Trigger", Toast.LENGTH_LONG).show();
+                        Uri uri = mContext.getContentResolver().insert(TriggerContract.TriggerEntry.CONTENT_URI, deleteValues);
+                        if (deleteValues.get(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT).equals(mContext.getString(R.string.location))) {
                             String name = (String) deleteValues.get(TriggerContract.TriggerEntry.COLUMN_NAME);
                             String connect = deleteValues.getAsString(TriggerContract.TriggerEntry.COLUMN_CONNECT);
+                            long id = TriggerContract.TriggerEntry.getIdFromUri(uri);
+                            double lat = deleteValues.getAsDouble(TriggerContract.TriggerEntry.COLUMN_LAT);
+                            double longitude = deleteValues.getAsDouble(TriggerContract.TriggerEntry.COLUMN_LONG);
                             String value = mContext.getString(R.string.text_exit);
                             if (connect.equals(mContext.getString(R.string.text_connect))) {
                                 value = mContext.getString(R.string.text_enter);
                             } else {
                                 value = mContext.getString(R.string.text_exit);
                             }
-                            MapFragment.addToGeoFence(name,value,getPendingIntent(),new MapFragment());
+                            MapFragment.addToGeoFence(name, value, id, new LatLng(lat, longitude), getPendingIntent(), new MapFragment());
                         }
                         deleteValues = null;
                     }
@@ -189,7 +205,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
         public PendingIntent getPendingIntent() {
             Intent intent = new Intent(mContext, GeofenceTrasitionService.class);
-            return  PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
         @Override

@@ -65,15 +65,17 @@ public class GeofenceTrasitionService extends IntentService {
         // Retrieve GeofenceTrasition
         int geoFenceTransition = geofencingEvent.getGeofenceTransition();
         // Check if the transition type
-        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+     //   if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
+       //         geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL ||
+                        geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT){
             // Get the geofence that were triggered
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             // Create a detail message with Geofences received
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences);
             if(checkDatabase(triggeringGeofences, geoFenceTransition)) {
                 // Send notification details as a String
-               // sendNotification(geofenceTransitionDetails);
+                sendNotification(geofenceTransitionDetails);
             }
         }
     }
@@ -82,7 +84,8 @@ public class GeofenceTrasitionService extends IntentService {
         for (Geofence geofence : trigger) {
             String name = geofence.getRequestId();
             String connect = "Connect";
-            if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            //if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            if (transition == Geofence.GEOFENCE_TRANSITION_DWELL) {
                 connect = getString(R.string.text_connect);
             } else {
                 connect = getString(R.string.text_disconnect);
@@ -117,12 +120,12 @@ public class GeofenceTrasitionService extends IntentService {
                     long lastmsgTime = prefs1.getLong(GeofenceTrasitionService.SHARED_LAST_MSG_TIME,-1);
                 //    if(System.currentTimeMillis() - lastmsgTime >= 1200*1000) {
                         if (ph_number != null) {
-                            //   ChangeSettings.sendMessage(c.getString(ChangeSettings.INDEX_PHNUMBER), message);
-                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                               ChangeSettings.sendMessage(c.getString(ChangeSettings.INDEX_PHNUMBER), message);
+                          /*  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                             SharedPreferences.Editor edit = prefs.edit();
                             edit.putLong(GeofenceTrasitionService.SHARED_LAST_MSG_TIME,System.currentTimeMillis());
                             edit.commit();
-                            sendNotification("sentMsg "+connect+" "+message);
+                            sendNotification("sentMsg "+connect+" "+message);*/
                         }
                    // }
                     ChangeSettings.writeToSharedPref(this, c.getLong(ChangeSettings.INDEX_TRIGGER_ID));
@@ -144,7 +147,8 @@ public class GeofenceTrasitionService extends IntentService {
             triggeringGeofencesList.add(geofence.getRequestId());
         }
         String status = null;
-        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER)
+      //  if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER)
+        if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)
             status = "Entering ";
         else if (geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT)
             status = "Exiting ";

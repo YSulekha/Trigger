@@ -65,7 +65,7 @@ public class TriggerActivity extends AppCompatActivity {
         Uri uri = TriggerContract.TriggerEntry.buildTaskUri(id);
         if (trigger.equals(getString(R.string.location))) {
             FragmentManager fm = getSupportFragmentManager();
-            EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri, null);
+            EditCreateLocationFragment editLocationDialogFragment = EditCreateLocationFragment.newInstance("Edit", true, uri,null, null);
             editLocationDialogFragment.show(fm, "Edit");
         } else {
             FragmentManager fm = getSupportFragmentManager();

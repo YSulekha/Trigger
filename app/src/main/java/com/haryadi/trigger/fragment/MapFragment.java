@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiManager;
@@ -57,11 +58,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.TriggerActivity;
 import com.haryadi.trigger.ZoomOutPageTransformer;
+import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.service.GeofenceTrasitionService;
 import com.haryadi.trigger.utils.ChangeSettings;
 import com.haryadi.trigger.utils.Constants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -78,9 +81,8 @@ public class MapFragment extends Fragment implements
         ResultCallback<Status>,
         EditCreateLocationFragment.locationListener {
 
-    @BindView(R.id.mapView)
-    MapView mMapView;
-    private GoogleMap map;
+    public static MapView mMapView;
+    private static GoogleMap map;
     public static GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     ArrayList<Geofence> mGeofenceList = new ArrayList<>();
@@ -88,7 +90,9 @@ public class MapFragment extends Fragment implements
 
     boolean submitPressed = false;
 
-    ArrayList<MarkerOptions> markers =  new ArrayList<>();
+    static ArrayList<MarkerOptions> markers =  new ArrayList<>();
+    public static HashMap<Long,Marker> markerMap = new HashMap<>();
+    public static HashMap<Long,Circle> circleMap = new HashMap<>();
 
     public static final int REQUEST_ENABLE_BT = 201;
 
@@ -96,6 +100,7 @@ public class MapFragment extends Fragment implements
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     public static final String SAVE_MAP_STATE = "mapview";
     public static final String SAVE_MARKER = "marker";
+    public static final String SHARED_ARRAY = "location_pin";
 
     @BindView(R.id.wifi_enable)
     FloatingActionButton wifiEnable;
@@ -123,15 +128,13 @@ public class MapFragment extends Fragment implements
                 R.layout.fragment_loc, container, false);
 
         ButterKnife.bind(this, rootview);
+        mMapView = (MapView) rootview.findViewById(R.id.mapView);
       //  markers =
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).
                 addApi(LocationServices.API).
                 build();
-
-
-        Log.v("OnCreateView", String.valueOf(markers.size()));
 
         EditText search = (EditText) rootview.findViewById(R.id.toolbarText);
         search.setOnClickListener(new View.OnClickListener() {
@@ -154,6 +157,41 @@ public class MapFragment extends Fragment implements
             }
         });
         return rootview;
+    }
+
+    public void queryDatabase(){
+        String where = TriggerContract.TriggerEntry.TABLE_NAME + "." +
+                TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT + " = ?";
+        String[] args = new String[]{"LOCATION"};
+        Cursor c = getActivity().getContentResolver().query(TriggerContract.TriggerEntry.CONTENT_URI, null, where, args,null);
+      //  Toast.makeText(getActivity(),"cursorCount"+String.valueOf(c.getCount())+c.getPosition(),Toast.LENGTH_LONG).show();
+     //   c.moveToFirst();
+        while (c.moveToNext()) {
+         //   if (c != null) {
+                double lat = c.getDouble(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_LAT));
+                double longitu = c.getDouble(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_LONG));
+                Log.v("queryDatabase",lat+" "+longitu);
+                String name = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_NAME));
+                String value = c.getString(c.getColumnIndex(TriggerContract.TriggerEntry.COLUMN_CONNECT));
+                long id = c.getLong(c.getColumnIndex(TriggerContract.TriggerEntry._ID));
+           //     Toast.makeText(getActivity(),"cursorCount"+name+value,Toast.LENGTH_LONG).show();
+                BitmapDescriptor defaultMarker =
+                        BitmapDescriptorFactory.defaultMarker(32);
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(new LatLng(lat, longitu))
+                        .title(name)
+                        .snippet(value)
+                        .icon(defaultMarker)
+                        .alpha(0.7f);
+                Marker marker = map.addMarker(markerOptions);
+                markerMap.put(id,marker);
+                markers.add(markerOptions);
+                Circle cir = drawGeofence(marker);
+                circleMap.put(id,cir);
+         //   c.moveToNext();
+            //}
+        }
+        c.close();
     }
 
     public void checkIfBluetoothEnabled(Context context) {
@@ -205,7 +243,7 @@ public class MapFragment extends Fragment implements
                     fm.close(true);
                     checkIfBluetoothEnabled(getActivity());
                 } else if (v.getId() == R.id.location_enable) {
-                    Toast t = Toast.makeText(getActivity(), getString(R.string.location_msg), Toast.LENGTH_SHORT);
+                    Toast t = Toast.makeText(getActivity(), getString(R.string.location_msg), Toast.LENGTH_LONG);
                     t.show();
                     fm.close(true);
                 }
@@ -234,6 +272,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        Log.v("On Resume","OnResumeMap");
         mMapView.onResume();
     }
 
@@ -274,6 +313,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
+
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -313,12 +353,13 @@ public class MapFragment extends Fragment implements
         if(markers.size()>0){
             for(int i=0;i<markers.size();i++){
                 MarkerOptions latLng = markers.get(i);
-                BitmapDescriptor defaultMarker =
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                 Marker marker = map.addMarker(latLng);
                 drawGeofence(marker);
             }
             map.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+        }
+        else{
+            queryDatabase();
         }
     }
 
@@ -331,8 +372,10 @@ public class MapFragment extends Fragment implements
             if (mLastLocation != null) {
                 map.setMyLocationEnabled(true);
                 LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+              /*  map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        latLng, 14));*/
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        latLng, 14));
+                        latLng, 15));
             }
 
         }
@@ -406,14 +449,19 @@ public class MapFragment extends Fragment implements
                             //  map.addMarker(new MarkerOptions().position(latLng).title("CurrentLocation"));
                             //    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
                             //  map.animateCamera(cameraUpdate);
+                         //   map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                //    latLng, 12));
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    latLng, 12));
+                                    latLng, 15));
                         }
                         return;
                     }
 
                 } else {
-                    requestPermission();
+                  //  requestPermission();
+                    Snackbar.make(layout, getString(R.string.location_perm_denied),
+                            Snackbar.LENGTH_SHORT).show();
+
                 }
                 break;
             }
@@ -437,9 +485,14 @@ public class MapFragment extends Fragment implements
     }
 
     private void showLocationFragment() {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, this);
-        editNameDialogFragment.show(fm, "LOCATION");
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission();
+        }
+        else {
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, searchPlace, this);
+            editNameDialogFragment.show(fm, "LOCATION");
+        }
     }
 
     public void populateGeoFenceList() {
@@ -458,11 +511,14 @@ public class MapFragment extends Fragment implements
                 setRequestId(name).
                 setExpirationDuration(Geofence.NEVER_EXPIRE).
                 setCircularRegion(searchPlace.latitude, searchPlace.longitude, Constants.GEOFENCE_RADIUS_IN_METERS);
-        if (transition.equals("Enter"))
-            builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+        if (transition.equals("Enter")) {
+         //   builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+            builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL);
+        }
         else{
             builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT);
         }
+        builder.setLoiteringDelay(300000);
         return builder.build();
     }
 
@@ -475,29 +531,34 @@ public class MapFragment extends Fragment implements
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         //builder.addGeofences(mGeofenceList);
         builder.addGeofence(createGeofenceObject(name,transition));
-        if (transition.equals("Enter"))
-            builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+        if (transition.equals("Enter")) {
+           // builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+            builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_DWELL);
+        }
         else{
             builder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_EXIT);
         }
         return builder.build();
     }
 
-    public static void addToGeoFence(String name, String transition, PendingIntent pendingIntent,ResultCallback mContext) {
+    public static void addToGeoFence(String name, String transition,long id,LatLng latLng, PendingIntent pendingIntent,ResultCallback mContext) {
 
         try {
             LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, createGeofenceReq(name,transition), pendingIntent).setResultCallback(mContext);
+            updateMap(latLng,name,transition,id);
         } catch (SecurityException ex) {
-            Log.v("No permission", "dds");
+            Log.v("No permission geofence", "dds");
         }
     }
 
     //Method called when geoFence is added
     public void onResult(Status status) {
         if (status.isSuccess()) {
-            Toast.makeText(getActivity(), getString(R.string.geofence_msg), Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getActivity(), getString(R.string.geofence_msg), Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getContext(), getString(R.string.geofence_msg), Toast.LENGTH_LONG).show();
         } else {
-            String error = ChangeSettings.getErrorString(getActivity(),status.getStatusCode());
+          //  String error = ChangeSettings.getErrorString(getActivity(),status.getStatusCode());
+            String error = ChangeSettings.getErrorString(getContext(),status.getStatusCode());
             Log.v("Error", error);
 
         }
@@ -523,9 +584,14 @@ public class MapFragment extends Fragment implements
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
                 searchPlace = place.getLatLng();
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, this);
-                editNameDialogFragment.show(fm, "LOCATION");
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermission();
+                }
+                else {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    EditCreateLocationFragment editNameDialogFragment = EditCreateLocationFragment.newInstance("LOCATION", false, null, searchPlace, this);
+                    editNameDialogFragment.show(fm, "LOCATION");
+                }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(getActivity(), data);
                 Log.e("SearchAct", status.getStatusMessage());
@@ -545,35 +611,63 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onListen(Bundle args) {
-        BitmapDescriptor defaultMarker =
+     /*   BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(searchPlace)
                 .title(args.getString("Name"))
                 .snippet(args.getString("Value"))
-                .icon(defaultMarker);
-        Marker marker = map.addMarker(markerOptions);
-        markers.add(markerOptions);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(searchPlace.latitude,searchPlace.longitude), 12));
-        Constants.BAY_AREA_LANDMARKS.put(args.getString("Name"), searchPlace);
+                .icon(defaultMarker);*/
+        long uniqId = args.getLong("uniqId");
+
+      /*  Marker marker = map.addMarker(markerOptions);
+        markerMap.put(uniqId,marker);
+        markers.add(markerOptions);*/
+
         PendingIntent pendingIntent = getPendingIntent();
-        addToGeoFence(args.getString("Name"),args.getString("Value"),pendingIntent,this);
-        drawGeofence(marker);
+        addToGeoFence(args.getString("Name"),args.getString("Value"),uniqId,new LatLng(searchPlace.latitude,searchPlace.longitude),pendingIntent,this);
+       /* Circle circle = drawGeofence(marker);
+        circleMap.put(uniqId,circle);
+        Log.v("Inside OnListen","sdfsf");*/
     }
+
+    public static void updateMap(LatLng latLng,String name,String value,long id){
+        Log.v("Inside Update",name);
+        Log.v("latlng",latLng.latitude+" "+latLng.longitude);
+        BitmapDescriptor defaultMarker =
+                BitmapDescriptorFactory.defaultMarker(32);
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(latLng)
+                .title(name)
+                .snippet(value)
+                .icon(defaultMarker)
+                .alpha(0.7f);
+        Marker marker = map.addMarker(markerOptions);
+        markerMap.put(id,marker);
+        markers.add(markerOptions);
+        Constants.BAY_AREA_LANDMARKS.put(name, latLng);
+        Circle cir = drawGeofence(marker);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                latLng, 15));
+        circleMap.put(id,cir);
+    }
+
     // Draw Geofence circle on GoogleMap
-    private Circle geoFenceLimits;
-    private void drawGeofence(Marker marker) {
-        if ( geoFenceLimits != null ){
+    private static Circle geoFenceLimits;
+    private static Circle drawGeofence(Marker marker) {
+      /*  if ( geoFenceLimits != null ){
             geoFenceLimits.remove();
-        }
+        }*/
+      //.fillColor( Color.TRANSPARENT )
 
         CircleOptions circleOptions = new CircleOptions()
                 .center( marker.getPosition())
-                .strokeColor(Color.BLACK)
-                .fillColor( Color.TRANSPARENT )
+                .strokeColor(Color.argb(255, 206, 122, 69))
+                .fillColor( Color.argb(64, 216, 146, 102) )
                 .radius( Constants.GEOFENCE_RADIUS_IN_METERS )
-                .strokeWidth( 10 );
+                .strokeWidth( 6 );
         geoFenceLimits = map.addCircle( circleOptions );
+        return geoFenceLimits;
+
     }
 }

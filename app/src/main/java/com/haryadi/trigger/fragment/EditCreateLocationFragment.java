@@ -15,7 +15,6 @@ import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.haryadi.trigger.R;
 import com.haryadi.trigger.data.TriggerContract;
 import com.haryadi.trigger.utils.ChangeSettings;
@@ -38,6 +38,8 @@ import com.haryadi.trigger.utils.ChangeSettings;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.widget.Toast.makeText;
 
 
 public class EditCreateLocationFragment extends DialogFragment {
@@ -63,16 +65,20 @@ public class EditCreateLocationFragment extends DialogFragment {
     @BindView(R.id.dialog_radio_disconnect)
     RadioButton radioDisConnect;
 
-    @BindView(R.id.expand)ImageButton buttonExpand;
+    @BindView(R.id.expand)
+    ImageButton buttonExpand;
     @BindView(R.id.content_main_d)
     RelativeLayout relate;
     @BindView(R.id.contact_num)
     EditText con;
 
-    @BindView(R.id.message) ImageButton messageButton;
+    @BindView(R.id.message)
+    ImageButton messageButton;
     @BindView(R.id.message_text)
     TextView messageText;
-    @BindView(R.id.contact_close) ImageButton contactClose;
+    @BindView(R.id.contact_close)
+    ImageButton contactClose;
+
 
     String contactName;
 
@@ -89,6 +95,7 @@ public class EditCreateLocationFragment extends DialogFragment {
 
     String id;
     String ph_number;
+    LatLng searchPlaceLat;
 
     public static final int REQUEST_SMS = 100;
     public static final int SEND_SMS = 101;
@@ -102,12 +109,15 @@ public class EditCreateLocationFragment extends DialogFragment {
         void onListen(Bundle args);
     }
 
-    public static EditCreateLocationFragment newInstance(String triggerPoint, boolean isEdit, Uri uri, locationListener list) {
+    public static EditCreateLocationFragment newInstance(String triggerPoint, boolean isEdit, Uri uri, LatLng searchPlace, locationListener list) {
         EditCreateLocationFragment frag = new EditCreateLocationFragment();
         Bundle args = new Bundle();
         mListener = list;
         args.putString("title", triggerPoint);
         args.putBoolean("isEdit", isEdit);
+        if (searchPlace != null) {
+            args.putParcelable("searchPlace", searchPlace);
+        }
         if (uri != null) {
             args.putString("Uri", uri.toString());
         }
@@ -128,6 +138,7 @@ public class EditCreateLocationFragment extends DialogFragment {
         isConnect = getString(R.string.text_connect);
         triggerPoint = getArguments().getString("title", "Enter Name");
         isEdit = getArguments().getBoolean("isEdit");
+        searchPlaceLat = getArguments().getParcelable("searchPlace");
         configureViews();
         if (isEdit) {
             mUri = Uri.parse(getArguments().getString("Uri"));
@@ -141,9 +152,9 @@ public class EditCreateLocationFragment extends DialogFragment {
         });
 
         //Screen Rotation
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
 
-            if(con.getText().toString().length()>0){
+            if (con.getText().toString().length() > 0) {
                 messageText.setVisibility(View.VISIBLE);
                 messageButton.setVisibility(View.VISIBLE);
             }
@@ -152,12 +163,11 @@ public class EditCreateLocationFragment extends DialogFragment {
         buttonExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(relate.isShown()) {
-                    ChangeSettings.slide_up(getActivity(),relate);
+                if (relate.isShown()) {
+                    ChangeSettings.slide_up(getActivity(), relate);
                     relate.setVisibility(View.GONE);
-                }
-                else{
-                    ChangeSettings.slide_down(getActivity(),relate);
+                } else {
+                    ChangeSettings.slide_down(getActivity(), relate);
                     relate.setVisibility(View.VISIBLE);
                 }
             }
@@ -166,11 +176,7 @@ public class EditCreateLocationFragment extends DialogFragment {
         con.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //  checkpermission();
-             //   con.setText("");
-                con.setFocusableInTouchMode(true);
-                Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
+                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
                 startActivityForResult(intent, PICK_CONTACT);
             }
         });
@@ -190,8 +196,8 @@ public class EditCreateLocationFragment extends DialogFragment {
         ringVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(progress == 0){
-                    Vibrator v = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                if (progress == 0) {
+                    Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                     v.vibrate(300);
                 }
             }
@@ -213,19 +219,17 @@ public class EditCreateLocationFragment extends DialogFragment {
         super.onActivityResult(reqCode, resultCode, data);
 
         switch (reqCode) {
-            case (PICK_CONTACT) :
-                Log.v("Inside ddsf","resul ok");
+            case (PICK_CONTACT):
                 if (resultCode == Activity.RESULT_OK) {
                     Uri contactData = data.getData();
-                    Cursor c =  getContext().getContentResolver().query(contactData, null, null, null, null);
+                    Cursor c = getContext().getContentResolver().query(contactData, null, null, null, null);
                     if (c.moveToFirst()) {
                         contactName = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                        id= c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
-                        if(Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
+                        id = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                        if (Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                             checkpermission();
-                        }
-                        else{
-                            Toast.makeText(getActivity(),"No Number associated with this contact.Choose another one",Toast.LENGTH_LONG).show();
+                        } else {
+                            makeText(getActivity(), getString(R.string.no_contact_num), Toast.LENGTH_LONG).show();
                         }
 
                         // TODO Fetch other Contact details as you want to use
@@ -238,21 +242,17 @@ public class EditCreateLocationFragment extends DialogFragment {
     }
 
     public void checkpermission() {
-        Log.v("ooo2","Cheack Permission");
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),android.Manifest.permission.READ_CONTACTS)) {
-            showMessageOKCancel("You need to allow access to Send SMS",
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.READ_CONTACTS)) {
+            showMessageOKCancel(getString(R.string.message_perm),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Log.v("oo03","OnClick");
                             requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
                                     REQUEST_SMS);
                         }
                     });
             return;
-        }
-        else{
-            Log.v("ooo2","OnElse");
+        } else {
             requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS},
                     REQUEST_SMS);
         }
@@ -288,11 +288,11 @@ public class EditCreateLocationFragment extends DialogFragment {
                     return;
 
                 } else {
-                    checkpermission();
+                    makeText(getActivity(),"Permissin Required",Toast.LENGTH_LONG).show();
                 }
                 break;
             }
-            case SEND_SMS:{
+            case SEND_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     int hasSMSPermission = ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.SEND_SMS);
@@ -302,12 +302,11 @@ public class EditCreateLocationFragment extends DialogFragment {
                         Cursor pCur = getContext().getContentResolver().query(
                                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                 null,
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
                                 new String[]{id}, null);
-                        if(pCur.getCount() == 0){
-                            Toast.makeText(getActivity(),"No number",Toast.LENGTH_LONG).show();
-                        }
-                        else {
+                        if (pCur.getCount() == 0) {
+                            makeText(getActivity(), "No number", Toast.LENGTH_LONG).show();
+                        } else {
                             while (pCur.moveToNext()) {
                                 ph_number = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                                 con.setText(contactName);
@@ -320,14 +319,14 @@ public class EditCreateLocationFragment extends DialogFragment {
                     return;
 
                 } else {
-                    checkpermission();
+                   // checkpermission();
+                    makeText(getActivity(),"Permissin Required",Toast.LENGTH_LONG).show();
                 }
                 break;
             }
-
-
         }
     }
+
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new android.support.v7.app.AlertDialog.Builder(getActivity())
                 .setMessage(message)
@@ -339,7 +338,6 @@ public class EditCreateLocationFragment extends DialogFragment {
 
 
     public void onRadioButtonClicked(int id) {
-        Log.v("OnClick", "onClick");
         switch (id) {
             case R.id.dialog_radio_connect:
                 if (radioConnect.isChecked()) {
@@ -388,7 +386,7 @@ public class EditCreateLocationFragment extends DialogFragment {
             notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
             messageText.setText(cursor.getString(ChangeSettings.INDEX_MSGTEXT));
             ph_number = cursor.getString(ChangeSettings.INDEX_PHNUMBER);
-            if(ph_number != null) {
+            if (ph_number != null) {
                 con.setText(ChangeSettings.getDisplayNameByNumber(getActivity(), ph_number));
                 messageButton.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.VISIBLE);
@@ -397,26 +395,31 @@ public class EditCreateLocationFragment extends DialogFragment {
         }
     }
 
-    private void insertRecord() {
+    private long insertRecord() {
         ContentValues values = new ContentValues();
         Uri uri = TriggerContract.TriggerEntry.CONTENT_URI;
         String name = mLocationName.getText().toString();
         values.put(TriggerContract.TriggerEntry.COLUMN_NAME, name);
         values.put(TriggerContract.TriggerEntry.COLUMN_MEDIAVOL, mediaVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_RINGVOL, ringVolumeBar.getProgress());
-        values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL,notifVolumeBar.getProgress());
+        values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL, notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-        values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,ph_number);
-        values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,messageText.getText().toString());
+        values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER, ph_number);
+        values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT, messageText.getText().toString());
         if (isEdit) {
             updateRecord(values);
+            return TriggerContract.TriggerEntry.getIdFromUri(mUri);
         } else {
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_POINT, triggerPoint);
             values.put(TriggerContract.TriggerEntry.COLUMN_TRIGGER_NAME, triggerPoint + "_" + name);
             values.put(TriggerContract.TriggerEntry.COLUMN_CONNECT, isConnect);
-            getActivity().getContentResolver().insert(uri, values);
+            values.put(TriggerContract.TriggerEntry.COLUMN_LAT, searchPlaceLat.latitude);
+            values.put(TriggerContract.TriggerEntry.COLUMN_LONG, searchPlaceLat.longitude);
+            Uri uriInsert = getActivity().getContentResolver().insert(uri, values);
+            return TriggerContract.TriggerEntry.getIdFromUri(uriInsert);
         }
+        // return -1;
     }
 
     private void updateRecord(ContentValues values) {
@@ -424,6 +427,7 @@ public class EditCreateLocationFragment extends DialogFragment {
                 TriggerContract.TriggerEntry._ID + " = ?";
         String[] args = new String[]{Long.toString(TriggerContract.TriggerEntry.getIdFromUri(mUri))};
         getActivity().getContentResolver().update(TriggerContract.TriggerEntry.CONTENT_URI, values, where, args);
+
     }
 
     private boolean checkForDuplicates() {
@@ -436,7 +440,7 @@ public class EditCreateLocationFragment extends DialogFragment {
             String[] args = new String[]{triggerPoint + "_" + name, isConnect};
             Cursor c = getActivity().getContentResolver().query(uri, null, where, args, null);
             if (c.moveToNext()) {
-                Toast.makeText(getActivity(), getString(R.string.text_duplicates), Toast.LENGTH_LONG).show();
+                makeText(getActivity(), getString(R.string.text_duplicates), Toast.LENGTH_LONG).show();
                 c.close();
                 return true;
             } else {
@@ -462,7 +466,10 @@ public class EditCreateLocationFragment extends DialogFragment {
             if (mLocationName.getText().toString().trim().equals("")) {
                 mLocationName.setError(getString(R.string.text_required));
             } else {
-                insertRecord();
+                long id = insertRecord();
+                Toast t = Toast.makeText(getActivity(),"For Location trigger to work,location should be enabled",Toast.LENGTH_LONG);
+               // t.setGravity(Gravity.BOTTOM,0,70);
+                t.show();
                 Bundle args = new Bundle();
                 args.putString("Name", mLocationName.getText().toString());
                 String value;
@@ -472,6 +479,8 @@ public class EditCreateLocationFragment extends DialogFragment {
                     value = getString(R.string.text_exit);
                 }
                 args.putString("Value", value);
+                args.putLong("uniqId", id);
+                //Listener is null in case of edit
                 if (mListener != null) {
                     mListener.onListen(args);
                 }

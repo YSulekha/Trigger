@@ -49,10 +49,10 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver {
                     Log.v("IntentDisconnec", String.valueOf(disconnectTime));
                     serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT, true);
                     serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME, wifiInfo.getSSID());
-                    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT_TIME, connectTime);
+                /*    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT_TIME, connectTime);
                     serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_DISCONNECT_TIME, disconnectTime);
                     serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_DISCONNECT,disconnectName);
-                    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT,connectName);
+                    serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT,connectName);*/
 
                     context.startService(serviceIntent);
                 }
@@ -81,10 +81,10 @@ public class WifiConnectivityReceiver  extends BroadcastReceiver {
                 Intent serviceIntent = new Intent(context,ChangeSettingsIntentService.class);
                 intent.putExtra(ChangeSettingsIntentService.EXTRA_CONNECT,false);
                 serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_NAME,wifiName);
-                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT_TIME, connectTime);
+               /* serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT_TIME, connectTime);
                 serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_DISCONNECT_TIME, disconnectTime);
                 serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_DISCONNECT,disconnectName);
-                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT,connectName);
+                serviceIntent.putExtra(ChangeSettingsIntentService.EXTRA_LAST_WIFI_CONNECT,connectName);*/
                 context.startService(serviceIntent);
             }
         }

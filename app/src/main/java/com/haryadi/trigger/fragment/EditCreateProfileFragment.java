@@ -1,34 +1,25 @@
 package com.haryadi.trigger.fragment;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -78,14 +69,14 @@ public class EditCreateProfileFragment extends DialogFragment {
     @BindView(R.id.wifi_name_text)
     TextView wifiNameText;
 
-    @BindView(R.id.expand)ImageButton buttonExpand;
+ /*   @BindView(R.id.expand)ImageButton buttonExpand;
     @BindView(R.id.content_main_d) RelativeLayout relate;
     @BindView(R.id.contact_num)
     EditText con;
 
     @BindView(R.id.message) ImageButton messageButton;
     @BindView(R.id.message_text) TextView messageText;
-    @BindView(R.id.contact_close) ImageButton contactClose;
+    @BindView(R.id.contact_close) ImageButton contactClose;*/
 
     String contactName;
 
@@ -133,7 +124,7 @@ public class EditCreateProfileFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_dialog_drop, container);
+        return inflater.inflate(R.layout.fragment_dialog, container);
     }
 
     @Override
@@ -165,12 +156,12 @@ public class EditCreateProfileFragment extends DialogFragment {
         });
         if(savedInstanceState != null){
 
-            if(con.getText().toString().length()>0){
+         /*   if(con.getText().toString().length()>0){
                 messageText.setVisibility(View.VISIBLE);
                 messageButton.setVisibility(View.VISIBLE);
-            }
+            }*/
         }
-        //Expand exp
+    /*    //Expand exp
         buttonExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,9 +174,9 @@ public class EditCreateProfileFragment extends DialogFragment {
                     relate.setVisibility(View.VISIBLE);
                 }
             }
-        });
+        });*/
         //msg exp
-        con.setOnClickListener(new View.OnClickListener() {
+   /*     con.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -204,7 +195,7 @@ public class EditCreateProfileFragment extends DialogFragment {
                 messageButton.setVisibility(View.GONE);
                 messageText.setVisibility(View.GONE);
             }
-        });
+        });*/
 
         ringVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -227,13 +218,12 @@ public class EditCreateProfileFragment extends DialogFragment {
         });
     }
 
-    @Override
+  /*  @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
 
         switch (reqCode) {
             case (PICK_CONTACT) :
-                Log.v("Inside ddsf","resul ok");
                 if (resultCode == Activity.RESULT_OK) {
                     Uri contactData = data.getData();
                     Cursor c =  getContext().getContentResolver().query(contactData, null, null, null, null);
@@ -253,7 +243,7 @@ public class EditCreateProfileFragment extends DialogFragment {
 
                 break;
         }
-    }
+    }*/
     public void onRadioButtonClicked(int id) {
         switch (id) {
             case R.id.dialog_radio_connect:
@@ -288,8 +278,7 @@ public class EditCreateProfileFragment extends DialogFragment {
         // }
     }
 
-    public void checkpermission() {
-        Log.v("ooo2","Cheack Permission");
+  /*  public void checkpermission() {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),android.Manifest.permission.READ_CONTACTS)) {
                     showMessageOKCancel("You need to allow access to Send SMS",
                             new DialogInterface.OnClickListener() {
@@ -333,7 +322,7 @@ public class EditCreateProfileFragment extends DialogFragment {
                                 con.setText(ph_number);
                             }
                             pCur.close();*/
-                        }
+               /*         }
                         return;
 
                 } else {
@@ -378,6 +367,7 @@ public class EditCreateProfileFragment extends DialogFragment {
 
         }
     }
+*
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new android.support.v7.app.AlertDialog.Builder(getActivity())
                 .setMessage(message)
@@ -385,7 +375,7 @@ public class EditCreateProfileFragment extends DialogFragment {
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show();
-    }
+    }*/
 
     private void configureViews() {
         arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, names);
@@ -437,13 +427,13 @@ public class EditCreateProfileFragment extends DialogFragment {
             mediaVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_MEDIAVOL));
             ringVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_RINGVOL));
             notifVolumeBar.setProgress(cursor.getInt(ChangeSettings.INDEX_NOTIFVOL));
-            messageText.setText(cursor.getString(ChangeSettings.INDEX_MSGTEXT));
-            ph_number = cursor.getString(ChangeSettings.INDEX_PHNUMBER);
+       //     messageText.setText(cursor.getString(ChangeSettings.INDEX_MSGTEXT));
+       /*     ph_number = cursor.getString(ChangeSettings.INDEX_PHNUMBER);
             if(ph_number != null) {
                 con.setText(ChangeSettings.getDisplayNameByNumber(getActivity(), ph_number));
                 messageButton.setVisibility(View.VISIBLE);
                 messageText.setVisibility(View.VISIBLE);
-            }
+            }*/
             cursor.close();
         }
     }
@@ -458,8 +448,8 @@ public class EditCreateProfileFragment extends DialogFragment {
         values.put(TriggerContract.TriggerEntry.COLUMN_NOTIFVOL, notifVolumeBar.getProgress());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISBLUETOOTHON, mIsBluetoothOn.getSelectedItem().toString());
         values.put(TriggerContract.TriggerEntry.COLUMN_ISWIFION, mIsWifiOn.getSelectedItem().toString());
-        values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,ph_number);
-        values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,messageText.getText().toString());
+       // values.put(TriggerContract.TriggerEntry.COLUMN_PH_NUMBER,ph_number);
+      //  values.put(TriggerContract.TriggerEntry.COLUMN_MSG_TEXT,messageText.getText().toString());
         if (isEdit) {
             values.put(TriggerContract.TriggerEntry.COLUMN_NAME, wifiNameText.getText().toString());
             updateRecord(values);

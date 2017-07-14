@@ -175,6 +175,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
+        android:contentDescription="@string/image_down_icon_desc"
         android:background="@android:color/transparent"
         android:layout_marginTop="10dp"
         android:padding="8dp"
@@ -235,72 +236,12 @@
         android:padding="8dp" />
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/contact"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_name"
-        android:padding="8dp"
-        android:layout_below="@id/content_main_d"
-        android:src="@drawable/ic_person_black_24dp" />
-
-    <EditText
-        android:id="@+id/contact_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/content_main_d"
-        android:layout_toEndOf="@id/contact"
-        android:hint="Add Contact"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:buttonTint="@color/colorAccent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:padding="8dp" />
-    <ImageButton
-        android:id="@+id/contact_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/content_main_d"
-        android:layout_toEndOf="@id/contact_num"
-        android:src="@drawable/ic_close_black_24dp"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"/>
-
-    <ImageButton
-        android:id="@+id/message"
-        android:visibility="gone"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/trigger_name"
-        android:padding="8dp"
-        android:layout_below="@id/contact_num"
-        android:src="@drawable/ic_message_black_24dp" />
-
-    <EditText
-        android:id="@+id/message_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/contact_num"
-        android:layout_toEndOf="@id/message"
-        android:visibility="gone"
-        android:hint="Add text here"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:buttonTint="@color/colorAccent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:padding="8dp" />
-
     <Button
         android:id="@+id/button_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/message"
+        android:layout_below="@id/content_main_d"
         android:layout_marginEnd="12dp"
         android:layout_marginTop="8dp"
         android:background="@color/colorAccent"

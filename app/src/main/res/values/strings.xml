@@ -1,12 +1,12 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
-    <string name="app_name">Trigger</string>
+    <string name="app_name">Spark</string>
     <string name="action_settings">Settings</string>
     <string name="action_geofence">Geofence</string>
 
     <string-array name="options">
-        <item>Leave Unchanged</item>
-        <item>Turn Off</item>
-        <item>Turn On</item>
+        <item>Leave unchanged</item>
+        <item>Turn off</item>
+        <item>Turn on</item>
     </string-array>
 
     <string name="bluetooth" translatable="false">BLUETOOTH</string>
@@ -17,8 +17,8 @@
     <string name="text_enter" translatable="false">Enter</string>
     <string name="text_exit" translatable="false">Exit</string>
 
-    <string name="location_msg">Add a location by adding a pin or search for a location</string>
-    <string name="text_duplicates">There is already a profile present for this trigger</string>
+    <string name="location_msg">Add a location by droping a pin or by searching for a location</string>
+    <string name="text_duplicates">Trigger exists</string>
     <string name="text_required">Name is a required field</string>
     <string name="trigger_name">Trigger Name</string>
     <string name="trigger_settings">Trigger Settings</string>
@@ -26,17 +26,18 @@
     <string name="trigger_wifi">Wifi Settings</string>
     <string name="trigger_media_volume">Media Volume Settings</string>
     <string name="trigger_ring_volume">Ring Volume Settings</string>
+    <string name="trigger_notif_volume">Notification Volume Settings</string>
     <string name="trigger_save">SAVE</string>
-    <string name="trigger_loc_hint">Add a nick name</string>
+    <string name="trigger_loc_hint">Nick name</string>
     <string name="trigger_search_hint">Search to add a location based trigger</string>
 
     <string name="settings_connect">On connect</string>
     <string name="settings_disconnect">On disconnect</string>
-    <string name="settings_enter">On Enter</string>
-    <string name="settings_exit">On Exit</string>
+    <string name="settings_enter">On enter</string>
+    <string name="settings_exit">On exit</string>
 
-    <string name="turn_on">Turn On</string>
-    <string name="turn_off">Turn Off</string>
+    <string name="turn_on">Turn on</string>
+    <string name="turn_off">Turn off</string>
 
     <string name="geofence_not_available">GeoFence not available</string>
     <string name="geofence_many_geofences">Too many GeoFences</string>
@@ -55,10 +56,10 @@
 
     <string name="recycler_empty_text">No Trigger Set</string>
 
-    <string name="bluetooth_error">To set the BLUETOOTH trigger, bluetooth should be enabled. Please enable the bluetooth and try again</string>
-    <string name="wifi_error">To create a WIFI trigger, wifi should be enabled. Please enable the wifi and try again</string>
-    <string name="loc_perm_exp">Permission required to access current location</string>
-    <string name="no_saved_wifi_bluetooth">There are no saved <xliff:g id="tiltle">%1$s</xliff:g> . To create a trigger there should be saved values</string>
+    <string name="bluetooth_error">Bluetooth should be enabled to set the bluetooth based trigger.</string>
+    <string name="wifi_error">Wifi should be enabled to set the wifi based trigger.</string>
+    <string name="loc_perm_exp">Permission required to add location based trigger.</string>
+    <string name="no_saved_wifi_bluetooth">There are no saved <xliff:g id="tiltle">%1$s</xliff:g> . To create a trigger there should be saved values.</string>
 
     <string name="wifi_alert">Do you want to enable WIFI ?</string>
     <string name="wifi_alert_title">Wifi Settings</string>
@@ -69,13 +70,23 @@
     <string name="map_styling_err">Style parsing failed.</string>
     <string name="map_styling_exc">Can\'t find style. Error: </string>
     
-    <string name="fab_wifi">WIFI</string>
-    <string name="fab_bluetooth">BLUETOOTH</string>
-    <string name="fab_loc">LOCATION</string>
-    <string name="fab_menu_label">SET TRIGGER HERE</string>
+    <string name="fab_wifi">Wifi</string>
+    <string name="fab_bluetooth">Bluetooth</string>
+    <string name="fab_loc">Location</string>
+    <string name="fab_menu_label">Set trigger here</string>
 
     <string name="notification_text">Trigger Enabled</string>
     <string name="geofence_msg">Geofence Added</string>
+
+    <string name="image_down_icon_desc">Expand</string>
+    <string name="image_close_icon_desc">Clear Contact</string>
+
+    <string name="contact_num_hint">Add contact to send SMS</string>
+    <string name="msg_hint_text">Add text here</string>
+    <string name="no_contact_num">No Number associated with this contact.</string>
+    <string name="message_perm">You need to allow access to Send SMS</string>
+
+    <string name="location_perm_denied">Location access permission denied</string>
 
 
 </resources>

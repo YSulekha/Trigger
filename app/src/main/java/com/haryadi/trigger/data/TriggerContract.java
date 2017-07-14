@@ -54,6 +54,13 @@ public class TriggerContract {
         //Column for message text
         public static final String COLUMN_MSG_TEXT = "msg_text";
 
+        //Column for latitude
+        public static final String COLUMN_LAT = "latitude";
+
+        //Column for longitude
+        public static final String COLUMN_LONG = "longitude";
+
+
         //returns uri with appended id
         public static Uri buildTaskUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
